@@ -1,5 +1,5 @@
 # Push Back
-This repository contains all of the code used *directly on robots* for the 2025-26 VEX season. The repositor is split into branches by robot.
+This repository contains all of the code used *directly on robots* for the 2025-26 VEX season. The repository is split into branches by robot.
 
 ## Branches
 * RI3D - Our robot in 3 days for preseason.
