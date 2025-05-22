@@ -1,3 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-main.cpp merge=ours
+* merge=theirs
+src/main.cpp merge=ours
+.vscode/vex_project_settings.json merge=ours
