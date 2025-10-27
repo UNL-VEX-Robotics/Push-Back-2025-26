@@ -3,3 +3,4 @@
 * merge=theirs
 src/main.cpp merge=ours
 .vscode/vex_project_settings.json merge=ours
+README.md merge=ours
