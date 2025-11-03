@@ -21,6 +21,37 @@ competition Competition;
 brain Brain;
 controller controller1(primary);
 
+vex::motor frontLeftTop = vex::motor(PORT1, ratio6_1, false);
+vex::motor frontLeftBottom = vex::motor(PORT2, ratio6_1, true);
+vex::motor frontRightTop = vex::motor(PORT4, ratio6_1, true);
+vex::motor frontRightBottom = vex::motor(PORT3, ratio6_1, false);
+vex::motor backLeftTop = vex::motor(PORT18, ratio6_1, false);
+vex::motor backLeftBottom = vex::motor(PORT17, ratio6_1, true);
+vex::motor backRightTop = vex::motor(PORT13, ratio6_1, true);
+vex::motor backRightBottom = vex::motor(PORT12, ratio6_1, false);
+
+vex::motor firstStage = vex::motor(PORT5, ratio6_1, false);
+vex::motor secondStage = vex::motor(PORT14, ratio6_1, true);
+vex::motor thirdStage = vex::motor(PORT15, ratio6_1, true);
+vex::motor leftRoller = vex::motor(PORT21, ratio6_1, false); // placeholder
+vex::motor rightRoller = vex::motor(PORT21, ratio6_1, true); // placeholder
+
+vex::rotation parallelRotation = vex::rotation(PORT6);
+vex::rotation perpendicularRotation = vex::rotation(PORT8);
+vex::distance leftDistance = vex::distance(PORT16);
+vex::distance rightDistance = vex::distance(PORT9);
+vex::inertial imu = vex::inertial(PORT10);
+vex::optical colorSensor = vex::optical(PORT11);
+
+std::vector<neblib::Line> obstacles = {
+  neblib::Line(neblib::Point(-72.0, -72.0), neblib::Point(72.0, -72.0)),
+  neblib::Line(neblib::Point(72.0, -72.0), neblib::Point(72.0, 72.0)),
+  neblib::Line(neblib::Point(-72.0, 72.0), neblib::Point(72.0, 72.0)),
+  neblib::Line(neblib::Point(-72.0, -72.0), neblib::Point(-72.0, 72.0))
+};
+neblib::MCL mcl = neblib::MCL({new neblib::Distance(leftDistance, 0.0, 0.0, 0.0), new neblib::Distance(rightDistance, 0.0, 0.0, 0.0)}, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallelRotation, 2.0)), 0.0, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicularRotation, 2.0)), 0.0, imu, 250, obstacles, 1.0, 0.05);
+neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftBottom), vex::motor_group(frontRightTop, frontRightBottom), vex::motor_group(backLeftTop, backLeftBottom), vex::motor_group(backRightTop, backRightBottom), &mcl, imu);
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
