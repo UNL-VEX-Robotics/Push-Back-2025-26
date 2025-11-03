@@ -9,6 +9,7 @@
 
 #include "vex.h"
 #include "neblib/xdrive.hpp"
+#include "neblib/auton_selector.hpp"
 #include "intake.hpp"
 #include <iostream>
 
@@ -33,8 +34,8 @@ vex::motor backRightBottom = vex::motor(PORT12, ratio6_1, false);
 vex::motor firstStage = vex::motor(PORT5, ratio6_1, false);
 vex::motor secondStage = vex::motor(PORT14, ratio6_1, true);
 vex::motor thirdStage = vex::motor(PORT15, ratio6_1, true);
-vex::motor leftRoller = vex::motor(PORT21, ratio6_1, false); // placeholder
-vex::motor rightRoller = vex::motor(PORT21, ratio6_1, true); // placeholder
+vex::motor leftRoller = vex::motor(PORT19, ratio6_1, false);
+vex::motor rightRoller = vex::motor(PORT7, ratio6_1, true); 
 
 vex::rotation parallelRotation = vex::rotation(PORT6);
 vex::rotation perpendicularRotation = vex::rotation(PORT8);
@@ -42,6 +43,14 @@ vex::distance leftDistance = vex::distance(PORT16);
 vex::distance rightDistance = vex::distance(PORT9);
 vex::inertial imu = vex::inertial(PORT10);
 vex::optical colorSensor = vex::optical(PORT11);
+
+vex::led hood = vex::led(Brain.ThreeWirePort.A);
+vex::led lift = vex::led(Brain.ThreeWirePort.B);
+vex::led front = vex::led(Brain.ThreeWirePort.C);
+
+neblib::Cylinder liftCylinders = neblib::Cylinder(lift);
+neblib::Cylinder hoodCylinder = neblib::Cylinder(hood);
+neblib::Cylinder frontCylinders = neblib::Cylinder(front);
 
 std::vector<neblib::Line> obstacles = {
   neblib::Line(neblib::Point(-72.0, -72.0), neblib::Point(72.0, -72.0)),
@@ -51,6 +60,20 @@ std::vector<neblib::Line> obstacles = {
 };
 neblib::MCL mcl = neblib::MCL({new neblib::Distance(leftDistance, 0.0, 0.0, 0.0), new neblib::Distance(rightDistance, 0.0, 0.0, 0.0)}, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallelRotation, 2.0)), 0.0, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicularRotation, 2.0)), 0.0, imu, 250, obstacles, 1.0, 0.05);
 neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftBottom), vex::motor_group(frontRightTop, frontRightBottom), vex::motor_group(backLeftTop, backLeftBottom), vex::motor_group(backRightTop, backRightBottom), &mcl, imu);
+Intake intake = Intake(vex::motor_group(leftRoller, rightRoller), vex::motor_group(firstStage), thirdStage, secondStage, hoodCylinder, liftCylinders, frontCylinders, colorSensor);
+
+neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Red"), {
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red AWP"),
+  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red Elim")
+});
+neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue AWP"),
+  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue Elim")
+});
+neblib::Page skillsPage = neblib::Page(neblib::Button(320, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Skills"), {
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Skills")
+});
+neblib::AutonSelector selector = neblib::AutonSelector(Brain, { &redPage, &bluePage, &skillsPage }, neblib::Button(180, 120, 120, 50, vex::color(255, 255, 255), vex::color(255, 255, 255), vex::color(0, 0, 0), vex::color(255, 255, 255), "Calibrate"));
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -63,7 +86,24 @@ neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftB
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
+  selector.runSelector();
 
+  Brain.Screen.clearScreen();
+  Brain.Screen.setPenColor(vex::color(255, 255, 255));
+  Brain.Screen.setFillColor(vex::color(0, 0, 0));
+
+  Brain.Screen.setCursor(1, 1);
+  Brain.Screen.print("Calibrating Inertial...");
+
+  imu.calibrate();
+  do { task::sleep(2); } while (imu.isCalibrating());
+
+  Brain.Screen.setPenColor(vex::color(0, 255, 0));
+  Brain.Screen.setCursor(2, 1);
+  Brain.Screen.print("Calibration Successful!");
+
+  task::sleep(500);
+  Brain.Screen.clearScreen(selector.getColor());
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -86,9 +126,27 @@ void autonomous(void) {
 
 
 void usercontrol(void) {
- 
+  neblib::launchTask(std::bind(&Intake::startLoop, &intake));
+
+  bool L1WasPressing = false;
+  bool R1WasPressing = false;
+  bool aWasPressing = false;
   while (true)
   {
+    double intakeVelocity = 0.0;
+    if (controller1.ButtonR2.pressing()) intakeVelocity = -100.0;
+    if (controller1.ButtonL2.pressing()) intakeVelocity = 100.0;
+    if (controller1.ButtonL1.pressing() && !L1WasPressing) liftCylinders.toggle();
+    if (controller1.ButtonR1.pressing() && !R1WasPressing) hoodCylinder.toggle();
+    if (controller1.ButtonA.pressing() && !aWasPressing) frontCylinders.toggle();
+    intake.setSpeed(intakeVelocity);
+
+    xDrive.driveLocal(controller1.Axis3.position(percent), controller1.Axis4.position(percent), controller1.Axis1.position(percent));
+
+    L1WasPressing = controller1.ButtonL1.pressing();
+    R1WasPressing = controller1.ButtonR1.pressing();
+    aWasPressing = controller1.ButtonA.pressing();
+
     task::sleep(10);
   }
 }

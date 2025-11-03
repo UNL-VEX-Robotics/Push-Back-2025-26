@@ -1,6 +1,6 @@
 #include "intake.hpp"
 
-Intake::Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::CylinderGroup &lift, neblib::CylinderGroup &front, vex::optical &colorSensor): topMotor(topMotor), middleMotor(middleMotor), frontMotors(frontMotors), mainMotors(mainMotors), hood(hood), lift(lift), front(front), colorSensor(colorSensor), velocity(0.0), running(false) {}
+Intake::Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::Cylinder &lift, neblib::Cylinder &front, vex::optical &colorSensor): topMotor(topMotor), middleMotor(middleMotor), frontMotors(frontMotors), mainMotors(mainMotors), hood(hood), lift(lift), front(front), colorSensor(colorSensor), velocity(0.0), running(false) {}
 
 void Intake::startLoop()
 {
@@ -21,11 +21,11 @@ void Intake::startLoop()
             middleMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
             msStopped = 0;
         }
-        else if (msStopped < 50)
+        else if (msStopped < 250)
         {
             middleMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
 
-            if (middleMotor.velocity(vex::velocityUnits::pct) < 0.05 * velocity) msStopped += 10;
+            if (middleMotor.velocity(vex::velocityUnits::pct) < 0.25 * velocity) msStopped += 5;
             else msStopped = 0;
         }
         else middleMotor.stop(vex::brakeType::coast);
@@ -33,7 +33,7 @@ void Intake::startLoop()
         if (hood.getState()) topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
         else topMotor.stop(vex::brakeType::coast);
 
-        vex::task::sleep(10);
+        vex::task::sleep(5);
     }
 }
 

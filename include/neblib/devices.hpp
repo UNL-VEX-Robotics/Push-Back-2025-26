@@ -117,12 +117,12 @@ namespace neblib
     class Cylinder 
     {
     private:
-        vex::digital_out cylinder;
-
+        vex::led &cylinder;
+        bool toggled;
     public:
         /// @brief Constructs a cylinder object
         /// @param port vex::triport
-        Cylinder(vex::triport::port port);
+        Cylinder(vex::led &cylinder);
 
         /// @brief Sets the cylinder to a desired state
         /// @param state boolean value

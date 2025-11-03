@@ -44,13 +44,18 @@ neblib::Distance::Distance(vex::distance &distance, double xOffset, double yOffs
 
 double neblib::Distance::getReading(vex::distanceUnits unit) { return distance.objectDistance(unit); }
 
-neblib::Cylinder::Cylinder(vex::triport::port port) : cylinder(port) {}
+neblib::Cylinder::Cylinder(vex::led &cylinder) : cylinder(cylinder), toggled(false) {}
 
-void neblib::Cylinder::set(bool state) { cylinder.set(state); }
+void neblib::Cylinder::set(bool state) 
+{ 
+    if (state) cylinder.off();
+    else cylinder.on();
+    toggled = state;
+}
 
-void neblib::Cylinder::toggle() { cylinder.set(!(bool)(cylinder.value())); }
+void neblib::Cylinder::toggle() { this->set(!toggled); }
 
-bool neblib::Cylinder::getState() { return (bool)(cylinder.value()); }
+bool neblib::Cylinder::getState() { return toggled; }
 
 neblib::CylinderGroup::CylinderGroup(std::initializer_list<vex::triport::port> ports)
 {

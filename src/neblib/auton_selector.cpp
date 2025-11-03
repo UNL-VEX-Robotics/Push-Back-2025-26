@@ -61,7 +61,7 @@ void neblib::AutonSelector::runSelector()
         }
         drawButton(endButton);
         while (!brain.Screen.pressing())
-            vex::task::sleep(2);
+            vex::task::sleep(10);
 
         // Logic
         if (buttonIsPressed(endButton))
@@ -94,7 +94,7 @@ void neblib::AutonSelector::runSelector()
         }
 
         while (brain.Screen.pressing())
-            vex::task::sleep(2);
+            vex::task::sleep(10);
     }
 }
 

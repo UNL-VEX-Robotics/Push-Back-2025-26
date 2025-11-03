@@ -12,8 +12,8 @@ private:
     vex::motor_group mainMotors;
 
     neblib::Cylinder &hood;
-    neblib::CylinderGroup &lift;
-    neblib::CylinderGroup &front;
+    neblib::Cylinder &lift;
+    neblib::Cylinder &front;
 
     vex::optical &colorSensor;
 
@@ -21,7 +21,7 @@ private:
     bool running;
 
 public:
-    Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::CylinderGroup &lift, neblib::CylinderGroup &front, vex::optical &colorSensor);
+    Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::Cylinder &lift, neblib::Cylinder &front, vex::optical &colorSensor);
 
     void startLoop();
     void stopLoop();
