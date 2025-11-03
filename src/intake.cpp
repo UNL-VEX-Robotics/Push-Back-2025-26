@@ -39,4 +39,4 @@ void Intake::startLoop()
 
 void Intake::stopLoop() { running = false; }
 
-void Intake::setSpeed(double velocity) { velocity = velocity; }
+void Intake::setSpeed(double velocity) { this->velocity = velocity; }
