@@ -58,7 +58,7 @@ std::vector<neblib::Line> obstacles = {
   neblib::Line(neblib::Point(-72.0, 72.0), neblib::Point(72.0, 72.0)),
   neblib::Line(neblib::Point(-72.0, -72.0), neblib::Point(-72.0, 72.0))
 };
-neblib::MCL mcl = neblib::MCL({new neblib::Distance(leftDistance, 0.0, 0.0, 0.0), new neblib::Distance(rightDistance, 0.0, 0.0, 0.0)}, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallelRotation, 2.0)), 0.0, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicularRotation, 2.0)), 0.0, imu, 250, obstacles, 1.0, 0.05);
+neblib::MCL mcl = neblib::MCL({new neblib::Distance(leftDistance, -5.9375, 0.8125, 270.0), new neblib::Distance(rightDistance, 5.9375, 0.8125, 90.0)}, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallelRotation, 2.0)), 3.25, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicularRotation, 2.0)), 0.875, imu, 250, obstacles, 1.0, 0.05);
 neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftBottom), vex::motor_group(frontRightTop, frontRightBottom), vex::motor_group(backLeftTop, backLeftBottom), vex::motor_group(backRightTop, backRightBottom), &mcl, imu);
 Intake intake = Intake(vex::motor_group(leftRoller, rightRoller), vex::motor_group(firstStage), thirdStage, secondStage, hoodCylinder, liftCylinders, frontCylinders, colorSensor);
 
@@ -104,8 +104,6 @@ void pre_auton(void) {
 
   task::sleep(500);
   Brain.Screen.clearScreen(selector.getColor());
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
 }
 
 void autonomous(void) {
@@ -126,6 +124,12 @@ void autonomous(void) {
 
 
 void usercontrol(void) {
+  /* REMOVE BEFORE COMPETITION, TESINT PURPOSES ONLY */
+  imu.calibrate();
+  do {task::sleep(5);} while (imu.isCalibrating());
+  imu.setHeading(90, deg);
+  /* REMOVE BEFORE COMPETITION, TESINT PURPOSES ONLY */
+
   neblib::launchTask(std::bind(&Intake::startLoop, &intake));
 
   bool L1WasPressing = false;
@@ -141,7 +145,7 @@ void usercontrol(void) {
     if (controller1.ButtonA.pressing() && !aWasPressing) frontCylinders.toggle();
     intake.setSpeed(intakeVelocity);
 
-    xDrive.driveLocal(controller1.Axis3.position(percent), controller1.Axis4.position(percent), controller1.Axis1.position(percent));
+    xDrive.driveGlobal(controller1.Axis3.position(percent), controller1.Axis4.position(percent), controller1.Axis1.position(percent));
 
     L1WasPressing = controller1.ButtonL1.pressing();
     R1WasPressing = controller1.ButtonR1.pressing();

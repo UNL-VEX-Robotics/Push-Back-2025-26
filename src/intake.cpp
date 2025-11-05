@@ -8,11 +8,7 @@ void Intake::startLoop()
     int msStopped = 0;
     while (running)
     {
-        // match load rollers only when not scoring through the top
-        if (!hood.getState()) frontMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
-        else frontMotors.stop(vex::brakeType::coast);
-
-        // main motors always
+        frontMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
         mainMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
 
         // middle motor only if reversed or scoring through top or if velocity can keep up
@@ -30,7 +26,7 @@ void Intake::startLoop()
         }
         else middleMotor.stop(vex::brakeType::coast);
 
-        if (hood.getState()) topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+        if (hood.getState() || velocity <= 0) topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
         else topMotor.stop(vex::brakeType::coast);
 
         vex::task::sleep(5);
