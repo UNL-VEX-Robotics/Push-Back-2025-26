@@ -15,19 +15,23 @@ void Intake::startLoop()
         if (velocity <= 0 || hood.getState())
         {
             middleMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+            topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
             msStopped = 0;
         }
         else if (msStopped < 250)
         {
             middleMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+            if (velocity > 0) topMotor.spin(vex::directionType::fwd, 0.2 * velocity, vex::velocityUnits::pct);
+            else topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
 
             if (middleMotor.velocity(vex::velocityUnits::pct) < 0.25 * velocity) msStopped += 5;
             else msStopped = 0;
         }
-        else middleMotor.stop(vex::brakeType::coast);
-
-        if (hood.getState() || velocity <= 0) topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
-        else topMotor.stop(vex::brakeType::coast);
+        else 
+        {
+            middleMotor.stop(vex::brakeType::coast);
+            topMotor.stop(vex::brakeType::coast);
+        }
 
         vex::task::sleep(5);
     }

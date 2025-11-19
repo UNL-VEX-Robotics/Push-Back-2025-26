@@ -35,6 +35,7 @@
 		"type_traits": "cpp",
 		"utility": "cpp",
 		"typeinfo": "cpp",
-		"numeric": "cpp"
+		"numeric": "cpp",
+		"cstring": "cpp"
 	}
 }
