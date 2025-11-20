@@ -38,10 +38,10 @@ vex::motor leftRoller = vex::motor(PORT19, ratio6_1, false);
 vex::motor rightRoller = vex::motor(PORT7, ratio6_1, true); 
 
 vex::rotation parallelRotation = vex::rotation(PORT6, false);
-vex::rotation perpendicularRotation = vex::rotation(PORT8, false);
+vex::rotation perpendicularRotation = vex::rotation(PORT8, true);
 vex::distance leftDistance = vex::distance(PORT16);
 vex::distance rightDistance = vex::distance(PORT9);
-vex::inertial imu = vex::inertial(PORT10);
+vex::inertial imu = vex::inertial(PORT10, vex::turnType::right);
 vex::optical colorSensor = vex::optical(PORT11);
 
 vex::led hood = vex::led(Brain.ThreeWirePort.A);
@@ -68,15 +68,16 @@ neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftB
 Intake intake = Intake(vex::motor_group(leftRoller, rightRoller), vex::motor_group(firstStage), thirdStage, secondStage, hoodCylinder, liftCylinders, frontCylinders, colorSensor);
 
 neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Red"), {
-  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red AWP"),
-  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red Elim")
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red AWP"),
+  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Elim"),
+  neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Safe")
 });
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
-  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue AWP"),
-  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue Elim")
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue AWP"),
+  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue Elim")
 });
 neblib::Page skillsPage = neblib::Page(neblib::Button(320, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Skills"), {
-  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Skills")
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Skills")
 });
 neblib::AutonSelector selector = neblib::AutonSelector(Brain, { &redPage, &bluePage, &skillsPage }, neblib::Button(180, 120, 120, 50, vex::color(255, 255, 255), vex::color(255, 255, 255), vex::color(0, 0, 0), vex::color(255, 255, 255), "Calibrate"));
 
@@ -125,13 +126,13 @@ int runMCL()
   while (true)
   {
     neblib::Pose pose = odom.updatePose();
-    // Brain.Screen.clearScreen();
-    // Brain.Screen.setCursor(1, 1);
-    // Brain.Screen.print(pose.x);
-    // Brain.Screen.setCursor(2, 1);
-    // Brain.Screen.print(pose.y);
-    // Brain.Screen.setCursor(3, 1);
-    // Brain.Screen.print(pose.heading);
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.print(pose.x);
+    Brain.Screen.setCursor(2, 1);
+    Brain.Screen.print(pose.y);
+    Brain.Screen.setCursor(3, 1);
+    Brain.Screen.print(imu.heading(deg));
     task::sleep(10);
   }
 }
@@ -224,6 +225,79 @@ void leftAWP(vex::color c)
   xDrive.stop();
 }
 
+void rightSafe(vex::color c)
+{
+  // Setup
+  odom.setPose(-55.0, -16.5, 270.0);
+  vex::task m = vex::task(runMCL);
+
+  // Math Loader 1
+  xDrive.driveToPose(-57.25, -46.25, 270.0, 1.25);
+  frontCylinders.toggle();
+  xDrive.driveLocal(2, 0, 0, volt);
+  intake.setSpeed(100);
+  task::sleep(1000);
+  xDrive.stop();
+  task::sleep(1750);
+
+  // Remove off-color blocks
+  xDrive.turnTo(225, 1.0);
+  intake.setSpeed(-70);
+  senseColor(c, 3000);
+  vex::task stopIntake([]() { // Set intake to stop
+    intake.setSpeed(100);
+    task::sleep(100);
+    intake.setSpeed(0);
+    task::sleep(10);
+    return 0;
+  });
+  intake.setSpeed(0);
+  task::sleep(10);
+  frontCylinders.toggle();
+  
+  // Score bottom goal
+  xDrive.driveToPose(-17.5, -8, 45, -6.0, 6.0, 2.0);
+  intake.setSpeed(-50);
+  task::sleep(2500);
+
+  // intake under long goal
+  intake.setSpeed(100);
+  xDrive.driveToPose(-19.75, -44, 95, -6, 6, 2.0);
+  xDrive.driveTo(-15, -44, -6, 6, 1.0);
+  frontCylinders.toggle();
+
+  // Match loader 2
+  xDrive.driveLocal(-8, 12, 0, volt);
+  neblib::Pose currentPose = odom.getPose();
+  while (currentPose.y > -52) 
+  {
+    currentPose = odom.getPose();
+    task::sleep(10);
+  }
+  frontCylinders.toggle();
+  xDrive.driveToPose(-61, -46, 270.0, -6, 6, 2);
+  frontCylinders.toggle();
+  xDrive.driveLocal(2, 0, 0, volt);
+  intake.setSpeed(100);
+  task::sleep(1000);
+  xDrive.stop();
+  task::sleep(1750);
+
+  // Score long goal
+  frontCylinders.toggle();
+  liftCylinders.toggle();
+  currentPose = odom.getPose();
+  xDrive.turnTo(90, 1.5);
+  hoodCylinder.toggle();
+  odom.setPose(currentPose.x, currentPose.y, 90);
+
+  xDrive.driveTo(-38, -46, -6, 6, 2.0);
+}
+
+void rightElims(vex::color c)
+{
+
+}
 void skills()
 {
   odom.setPose(-55.0, 16.5, 270.0);
@@ -336,6 +410,12 @@ void autonomous(void) {
 
   int startTime = Brain.Timer.time();
   if (neblib::contains(auton, "AWP")) leftAWP(c);
+  else if (neblib::contains(auton, "Elims")) 
+  {
+    rightSafe(c);
+    rightElims(c);
+  }
+  else if (neblib::contains(auton, "Safe")) rightSafe(c);
   else if (neblib::contains(auton, "Skills")) skills();
   else 
   {
@@ -382,7 +462,7 @@ void usercontrol(void) {
 
   bool L1WasPressing = false;
   bool R1WasPressing = false;
-  bool aWasPressing = false;
+  bool yWasPressing = false;
   while (true)
   {
     double intakeVelocity = 0.0;
@@ -390,14 +470,14 @@ void usercontrol(void) {
     if (controller1.ButtonL2.pressing()) intakeVelocity = hoodCylinder.getState() ? 70 : 100.0;
     if (controller1.ButtonL1.pressing() && !L1WasPressing) liftCylinders.toggle();
     if (controller1.ButtonR1.pressing() && !R1WasPressing) hoodCylinder.toggle();
-    if (controller1.ButtonA.pressing() && !aWasPressing) frontCylinders.toggle();
+    if (controller1.ButtonY.pressing() && !yWasPressing) frontCylinders.toggle();
     intake.setSpeed(intakeVelocity);
 
     xDrive.driveGlobal(controller1.Axis3.position(percent) * 0.12, controller1.Axis4.position(percent) * 0.12, controller1.Axis1.position(percent) * 0.12, volt);
 
     L1WasPressing = controller1.ButtonL1.pressing();
     R1WasPressing = controller1.ButtonR1.pressing();
-    aWasPressing = controller1.ButtonA.pressing();
+    yWasPressing = controller1.ButtonY.pressing();
 
     task::sleep(10);
   }

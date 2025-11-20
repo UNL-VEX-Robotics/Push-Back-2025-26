@@ -37,28 +37,28 @@ void neblib::XDrive::driveLocal(double drive, double strafe, double turn, vex::v
 
 void neblib::XDrive::driveAngle(double velocity, double deg, double turn, vex::velocityUnits unit)
 {
-    double x = velocity * cosf(neblib::toRad(deg));
-    double y = velocity * sinf(neblib::toRad(deg));
+    double x = velocity * sin(neblib::toRad(deg));
+    double y = velocity * cos(neblib::toRad(deg));
 
     this->driveLocal(y, x, turn, unit);
 }
 
 void neblib::XDrive::driveAngle(double velocity, double deg, double turn, vex::voltageUnits unit)
 {
-    double x = velocity * cosf(neblib::toRad(deg));
-    double y = velocity * sinf(neblib::toRad(deg));
+    double x = velocity * sin(neblib::toRad(deg));
+    double y = velocity * cos(neblib::toRad(deg));
 
     this->driveLocal(y, x, turn, unit);
 }
 
 void neblib::XDrive::driveGlobal(double x, double y, double turn, vex::velocityUnits unit)
 {
-    this->driveAngle(hypot(x, y), neblib::toDeg(atan2f(x, y)) + imu.heading(vex::rotationUnits::deg) - 90, turn, unit);
+    this->driveAngle(hypot(x, y), neblib::toDeg(atan2(y, x)) - imu.heading(vex::rotationUnits::deg) + 90, turn, unit);
 }
 
 void neblib::XDrive::driveGlobal(double x, double y, double turn, vex::voltageUnits unit)
 {
-    this->driveAngle(hypotf(x, y), neblib::toDeg(atan2f(x, y)) + imu.heading(vex::rotationUnits::deg) - 90, turn, unit);
+    this->driveAngle(hypot(x, y), neblib::toDeg(atan2(y, x)) - imu.heading(vex::rotationUnits::deg) + 90, turn, unit);
 }
 
 void neblib::XDrive::stop(vex::brakeType stopType)
