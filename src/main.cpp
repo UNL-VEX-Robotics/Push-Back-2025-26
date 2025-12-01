@@ -177,7 +177,7 @@ void leftElims(vex::color c)
     hoodCylinder.toggle();
     return 0;
   });
-  xDrive.driveToPose(-8.5, 13.25, 135.0, -5, 5, 2.5);
+  xDrive.driveToPose(-7.5, 13.25, 135.0, -5, 5, 2.5);
   intake.setSpeed(-100.0);
   task::sleep(100);
   intake.setSpeed(50.0);
@@ -192,20 +192,20 @@ void leftElims(vex::color c)
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   task::sleep(1000);
 
-  // Intake under long goal
-  intake.setSpeed(0);
-  vex::task t1([]() {
-    task::sleep(500);
-    hoodCylinder.toggle();
-    return 0;
-  });
-  xDrive.driveToPose(-16, 53.5, 85, -4, 4, 2.0);
-  intake.setSpeed(100);
-  xDrive.driveTo(-10, 53.5, -4.5, 4.5, 2.0);
+  // // Intake under long goal
+  // intake.setSpeed(0);
+  // vex::task t1([]() {
+  //   task::sleep(500);
+  //   hoodCylinder.toggle();
+  //   return 0;
+  // });
+  // xDrive.driveToPose(-16, 53.5, 85, -4, 4, 2.0);
+  // intake.setSpeed(100);
+  // xDrive.driveTo(-10, 53.5, -4.5, 4.5, 2.0);
 
-  // Match load
-  xDrive.driveLocal(-8, -8, 0, volt);
-  waitUntil(odom.getPose().y > 63);
+  // // Match load
+  // xDrive.driveLocal(-8, -8, 0, volt);
+  // waitUntil(odom.getPose().y > 63);
   xDrive.driveTo(-48, 58, -6, 6, 2);
   currentPose = odom.getPose();
   xDrive.turnTo(270, 1);
