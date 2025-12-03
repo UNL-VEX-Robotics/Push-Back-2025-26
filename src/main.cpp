@@ -63,9 +63,9 @@ std::vector<neblib::Line> obstacles = {
   neblib::Line(neblib::Point(-9.4375, -6.625), neblib::Point(6.625, 9.4375))
 };
 //neblib::MCL mcl = neblib::MCL({new neblib::Distance(leftDistance, -5.9375, 0.8125, 270.0), new neblib::Distance(rightDistance, 5.9375, 0.8125, 90.0)}, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallelRotation, 2.0)), 3.25, std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicularRotation, 2.0)), 0.25, imu, 250, obstacles, 1.0, 0.05);
-neblib::RotationTrackerWheel parallel = neblib::RotationTrackerWheel(parallelRotation, 2.0);
-neblib::RotationTrackerWheel perpendicular = neblib::RotationTrackerWheel(perpendicularRotation, 2.0);
-neblib::Odometry odom = neblib::Odometry(parallel, 3.25, perpendicular, 0.25, imu);
+neblib::RotationTrackerWheel parallel = neblib::RotationTrackerWheel(parallelRotation, 2.0440706731398);
+neblib::RotationTrackerWheel perpendicular = neblib::RotationTrackerWheel(perpendicularRotation, 2.0170210492856);
+neblib::Odometry odom = neblib::Odometry(parallel, -4.19372, perpendicular, -0.00011, imu);
 neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftBottom), vex::motor_group(frontRightTop, frontRightBottom), vex::motor_group(backLeftTop, backLeftBottom), vex::motor_group(backRightTop, backRightBottom), &odom, imu);
 Intake intake = Intake(vex::motor_group(leftRoller, rightRoller), vex::motor_group(firstStage), thirdStage, secondStage, hoodCylinder, liftCylinders, frontCylinders, colorSensor);
 
@@ -84,7 +84,7 @@ neblib::AutonSelector selector = neblib::AutonSelector(Brain, { &redPage, &blueP
 
 neblib::PID turnPID = neblib::PID(0.125, 0.005, 0.125, 15.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
 neblib::PID rotationalPID = neblib::PID(0.125, 0.0, 0.0, 0.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
-neblib::PID drivePID = neblib::PID(0.5, 0.005, 0.75, 6.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
+neblib::PID drivePID = neblib::PID(0.5, 0.005, 0.5, 8.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -127,13 +127,13 @@ int runMCL()
   while (true)
   {
     neblib::Pose pose = odom.updatePose();
-    // Brain.Screen.clearScreen();
-    // Brain.Screen.setCursor(1, 1);
-    // Brain.Screen.print(pose.x);
-    // Brain.Screen.setCursor(2, 1);
-    // Brain.Screen.print(pose.y);
-    // Brain.Screen.setCursor(3, 1);
-    // Brain.Screen.print(pose.heading);
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.print(pose.x);
+    Brain.Screen.setCursor(2, 1);
+    Brain.Screen.print(pose.y);
+    Brain.Screen.setCursor(3, 1);
+    Brain.Screen.print(pose.heading);
     task::sleep(10);
   }
 }
@@ -265,7 +265,7 @@ void skills()
   vex::task m = vex::task(runMCL);
 
   // Match Loads
-  xDrive.driveToPose(-57.0, 46.5, 270.0, 1.5);
+  xDrive.driveToPose(-57.0, 46.25, 270.0, 1.5);
   frontCylinders.toggle();
   xDrive.driveLocal(2, 0, 0, volt);
   intake.setSpeed(100);
@@ -273,104 +273,33 @@ void skills()
   xDrive.stop();
   task::sleep(1000);
 
-  // Score long goal
-  xDrive.driveTo(-48, 46.5, -6.0, 6.0, 4.0);
+  // Score opposite side
   frontCylinders.toggle();
-  neblib::Pose currentPose = odom.getPose();
-  xDrive.turnTo(90, 1);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  intake.setSpeed(0);
-  liftCylinders.toggle();
-  vex::task t([]() 
-  {
-    task::sleep(250);
+  xDrive.driveToPose(-24, 58, 270, -6, 6, 1.5);
+  xDrive.driveTo(36, 58, -6, 6, 2.0);
+  vex::task t0 = vex::task([]() {
+    liftCylinders.toggle();
+    intake.setSpeed(0);
+    task::sleep(10);
     hoodCylinder.toggle();
     return 0;
   });
-  xDrive.driveToPose(-28, 46.25, 90, -5, 5, 1.5);
-  intake.setSpeed(-100.0);
-  task::sleep(100);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-3, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 100);
-  xDrive.stop();
-  task::sleep(2000);
-  xDrive.driveLocal(8, 0, 0, volt);
-  task::sleep(150);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(200);
-
-  // Intake under long goal
-  xDrive.driveLocal(0, 8, 0, volt);
-  waitUntil(odom.getPose().y < 35);
-  liftCylinders.toggle();
-  hoodCylinder.toggle();
-  intake.setSpeed(0);
-  xDrive.driveLocal(8, 0, 0, volt);
-  waitUntil(odom.getPose().x > -18);
-  xDrive.driveToPose(-16.25, 47, 100, -4, 4, 2.25);
+  xDrive.driveTo(36, 46.5, -6, 6, 2);
+  xDrive.driveTo(29.5, 46.5, -6, 6, 1.5);
+  vex::task t1 = vex::task([]() {
+    xDrive.driveLocal(-2.5, 0, 0, volt);
+    int t = 0;
+    while (thirdStage.velocity(rpm) < 50 && t < 2000) {
+      task::sleep(5);
+      t += 5;
+    }
+    xDrive.stop(hold);
+    return 0;
+  });
   intake.setSpeed(100);
-  task::sleep(50);
-  xDrive.driveToPose(-8.5, 47, 90, -4, 4, 1.5);
+  task::sleep(3000);
+  controller1.rumble(".");
 
-  // Match load
-  xDrive.driveLocal(0, -8, 0, volt);
-  waitUntil(odom.getPose().y > 54);
-  frontCylinders.toggle();
-  xDrive.driveTo(36, 56, -6, 6, 2);
-  frontCylinders.toggle();
-  xDrive.driveToPose(56, 44, 90, -6, 6, 2);
-  frontCylinders.toggle();
-  xDrive.driveLocal(2, 0, 0, volt);
-  intake.setSpeed(100);
-  task::sleep(500);
-  for (int i = 0; i < 200; i++)
-  {
-    xDrive.driveLocal(0, 0, 90-imu.heading(deg), volt);
-    task::sleep(10);
-  }
-
-  // Score long goal
-  xDrive.driveTo(38, 45.5, -5, 5, 2);
-  currentPose = odom.getPose();
-  xDrive.turnTo(270);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  frontCylinders.toggle();
-  intake.setSpeed(0);
-  task::sleep(20);
-  liftCylinders.toggle();
-  hoodCylinder.toggle();
-  xDrive.driveToPose(26, 45, 270, -5, 5, 2);
-  intake.setSpeed(-100.0);
-  task::sleep(100);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-3, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 100);
-  xDrive.stop();
-  task::sleep(2000);
-  xDrive.driveLocal(8, 0, 0, volt);
-  task::sleep(150);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(200);
-
-  // Clear red zone
-  xDrive.driveLocal(0, 8, 0, volt);
-  waitUntil(odom.getPose().y > 54);
-  frontCylinders.toggle();
-  liftCylinders.toggle();
-  hoodCylinder.toggle();
-  xDrive.driveTo(-45, 58, -6, 6, 3);
-  intake.setSpeed(0);
-  xDrive.driveToPose(-46, -40, 270, -8, 8, 3);
-
-  // Park
-  xDrive.turnTo(180);
-  xDrive.driveLocal(0, 8, 0, volt);
-  task::sleep(1000);
-  xDrive.driveLocal(-12.0, 3.0, 0.0, volt);
-  waitUntil(imu.roll(deg) > -10.0);
-  task::sleep(1000);
-  xDrive.stop();
 }
 
 void autonomous(void) {
@@ -394,11 +323,14 @@ void autonomous(void) {
   else if (neblib::contains(auton, "Skills")) skills();
   else 
   {
-    controller1.rumble(".");
+    imu.calibrate();
+    do { task::sleep(2); } while (imu.isCalibrating());
     odom.setPose(0.0, 0.0, 90.0);
     vex::task t = vex::task(runMCL);
-    xDrive.driveToPose(24.0, 0.0, 0.0);
-    xDrive.driveToPose(48.0, 0.0, 180.0);
+    xDrive.driveToPose(24.0, 0.0, 0.0, -6, 6);
+    controller1.rumble(".");
+    xDrive.driveToPose(48.0, 0.0, 180.0, -6, 6);
+    controller1.rumble(".");
     t.stop();
     neblib::Pose pose = odom.getPose();
     controller1.Screen.print(pose.x);
@@ -435,6 +367,7 @@ void usercontrol(void) {
   bool R1WasPressing = false;
   bool aWasPressing = false;
   bool xWasPressing = false;
+  bool bWasPressing = false;
   while (true)
   {
     double intakeVelocity = 0.0;
@@ -444,6 +377,14 @@ void usercontrol(void) {
     if (controller1.ButtonR1.pressing() && !R1WasPressing) hoodCylinder.toggle();
     if (controller1.ButtonA.pressing() && !aWasPressing) frontCylinders.toggle();
     if (controller1.ButtonX.pressing() && !xWasPressing) pokeCylinder.toggle();
+    if (controller1.ButtonB.pressing() && !bWasPressing) 
+    {
+      controller1.Screen.clearScreen();
+      controller1.Screen.setCursor(1, 1);
+      controller1.Screen.print("||%.5lf", parallel.getPosition() / neblib::toRad(imu.rotation(deg)));
+      controller1.Screen.setCursor(2, 1);
+      controller1.Screen.print(" T%.5lf", perpendicular.getPosition() / neblib::toRad(imu.rotation(deg)));
+    }
     intake.setSpeed(intakeVelocity);
 
     xDrive.driveGlobal(controller1.Axis3.position(percent) * 0.12, controller1.Axis4.position(percent) * 0.12, controller1.Axis1.position(percent) * 0.12, volt);
@@ -452,6 +393,7 @@ void usercontrol(void) {
     R1WasPressing = controller1.ButtonR1.pressing();
     aWasPressing = controller1.ButtonA.pressing();
     xWasPressing = controller1.ButtonX.pressing();
+    bWasPressing = controller1.ButtonB.pressing();
 
     task::sleep(10);
   }
