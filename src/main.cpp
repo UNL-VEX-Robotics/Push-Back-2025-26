@@ -274,9 +274,9 @@ void skills()
 
   // Score opposite side
   frontCylinders.toggle();
-  xDrive.driveToPose(-24, 56.5, 270, -6, 6, 1.5);
+  xDrive.driveToPose(-28, 57.5, 270, -6, 6, 1.5);
   controller1.Screen.print("Y: %lf", odom.getPose().y);
-  xDrive.driveTo(36, 55.5, -6, 6, 2.0);
+  xDrive.driveTo(36, 57, -6, 6, 2.0);
   controller1.Screen.clearLine();
   controller1.Screen.print("Y: %lf", odom.getPose().y);
   xDrive.driveLocal(0, 4, 0, volt);
@@ -313,7 +313,8 @@ void skills()
   xDrive.turnTo(90, 2);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   hoodCylinder.toggle();
-  xDrive.driveTo(57, currentPose.y - 2.1, -6, 6, 1.5);
+  liftCylinders.toggle();
+  xDrive.driveTo(57, currentPose.y - 1.5, -6, 6, 1.5);
   intake.setSpeed(100);
   frontCylinders.toggle();
   xDrive.driveLocal(2, 0, 0, volt);
@@ -322,7 +323,6 @@ void skills()
   xDrive.stop();
   task::sleep(500);
   frontCylinders.toggle();
-  xDrive.driveLocal(-2, 0, 0, volt);
   task::sleep(500);
   frontCylinders.toggle();
   xDrive.stop();
@@ -330,35 +330,41 @@ void skills()
   frontCylinders.toggle();
   task::sleep(500);
   frontCylinders.toggle();
-  task::sleep(1000);
-  frontCylinders.toggle();
-  task::sleep(500);
-  frontCylinders.toggle();
-  task::sleep(1000);
-  frontCylinders.toggle();
-  task::sleep(500);
-  frontCylinders.toggle();
-  task::sleep(1000);
+  task::sleep(1500);
 
   // Intake 2 red on side
   frontCylinders.toggle();
-  xDrive.driveTo(47, currentPose.y, -6, 6, 2);
+  liftCylinders.toggle();
+  task::sleep(250);
+  xDrive.driveTo(46, currentPose.y, -6, 6, 2);
   currentPose = odom.getPose();
   xDrive.turnTo(0, 1.5);
+  auto goalY = currentPose.y;
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   xDrive.driveTo(currentPose.x, 60, -6, 6, 1.5);
+  pokeCylinder.toggle();
 
   //Score
   xDrive.driveLocal(-3, 0, 0, volt);
   task::sleep(250);
-  xDrive.driveTo(currentPose.x, currentPose.y, -6, 6, 1.5);
+  xDrive.driveTo(currentPose.x, 50, -6, 6, 2);
   currentPose = odom.getPose();
-  xDrive.turnTo(270, 1.5);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  intake.setSpeed(0);
-  task::sleep(10);
-  hoodCylinder.toggle();
-  xDrive.driveTo(26, currentPose.y + 1, -6, 6, 1.5);
+  xDrive.turnTo(270, -3, 3, 3);
+  odom.setPose(currentPose.x, currentPose.y, 270);
+  xDrive.driveLocal(0, 4, 0, volt);
+  task::sleep(1250);
+  currentPose = odom.getPose();
+  odom.setPose(currentPose.x, 60, imu.heading(deg));
+  xDrive.driveToPose(currentPose.x, goalY + 1, 270, -4, 4, 3);
+  task t4 = task([]() {
+    task::sleep(250);
+    pokeCylinder.toggle();
+    intake.setSpeed(0);
+    task::sleep(10);
+    hoodCylinder.toggle();
+    return 0;
+  });
+  xDrive.driveToPose(26, goalY + 1, 270, -5, 5, 1.5);
   vex::task t2 = vex::task([]() {
     xDrive.driveLocal(-2, 0, 0, volt);
     int t = 0;
@@ -374,10 +380,12 @@ void skills()
   xDrive.driveLocal(8, 0, 0, volt);
   task::sleep(150);
   xDrive.driveLocal(-6, 0, 0, volt);
-  xDrive.driveTo(40, currentPose.y + 3, -6, 6, 1.5);
+  task::sleep(50);
+  xDrive.driveLocal(-4, 4, 0, volt);
+  task::sleep(250);
 
   // Clear park zone
-  xDrive.driveTo(36, 56.5, -6, 6, 2.0);
+  xDrive.driveToPose(36, 57, 270, -6, 6, 2.0);
   task t3 = task([]() {
     hoodCylinder.toggle();
     liftCylinders.toggle();
@@ -386,7 +394,25 @@ void skills()
   xDrive.driveTo(-40, 65, -6, 6, 2);
   xDrive.driveTo(-50, 30, -6, 6, 3);
   intake.setSpeed(0);
-  xDrive.driveLocal(5, -5, 0, volt);
+  xDrive.driveLocal(5, 0, 0, volt);
+  task::sleep(1500);
+  xDrive.driveLocal(1, -6, 0, volt);
+  task::sleep(1000);
+  currentPose = odom.getPose();
+  odom.setPose(currentPose.x, 17.5, imu.heading(deg));
+
+  xDrive.driveTo(-36, 20, -6, 6, 2);
+  xDrive.driveTo(-36, 0, -6, 6, 2);
+  xDrive.driveTo(-44, 0, -6, 6, 2);
+  xDrive.driveLocal(2, 0, 0, volt);
+  task::sleep(1000);
+  pokeCylinder.toggle();
+  task::sleep(750);
+  xDrive.driveTo(-36, 0, -4, 4, 2.5);
+  xDrive.turnTo(90, -3, 3, 2);
+  pokeCylinder.toggle();
+  task::sleep(250);
+  xDrive.driveLocal(-8, 1, 0, volt);
   task::sleep(1500);
   xDrive.stop(hold);
 }
