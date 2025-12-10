@@ -341,7 +341,7 @@ void skills()
   xDrive.turnTo(0, 1.5);
   auto goalY = currentPose.y;
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(currentPose.x, 60, -6, 6, 1.5);
+  xDrive.driveTo(currentPose.x - 2, 60, -6, 6, 1.5);
   pokeCylinder.toggle();
 
   //Score
@@ -402,13 +402,13 @@ void skills()
   odom.setPose(currentPose.x, 17.5, imu.heading(deg));
 
   xDrive.driveTo(-36, 20, -6, 6, 2);
-  xDrive.driveTo(-36, 1, -6, 6, 2);
-  xDrive.driveTo(-44, 1, -6, 6, 2);
+  xDrive.driveTo(-36, -2, -6, 6, 2);
+  xDrive.driveTo(-44, -2, -6, 6, 2);
   xDrive.driveLocal(3, 0, 0, volt);
   task::sleep(1000);
   pokeCylinder.toggle();
   task::sleep(750);
-  xDrive.driveTo(-36, 0, -4, 4, 2.5);
+  xDrive.driveTo(-36, 1, -4, 4, 2.5);
   xDrive.turnTo(90, -3, 3, 2);
   pokeCylinder.toggle();
   task::sleep(250);
