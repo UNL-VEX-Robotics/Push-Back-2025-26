@@ -382,10 +382,10 @@ void skills()
   xDrive.driveLocal(-6, 0, 0, volt);
   task::sleep(50);
   xDrive.driveLocal(-4, 4, 0, volt);
-  task::sleep(250);
+  task::sleep(300);
 
   // Clear park zone
-  xDrive.driveToPose(36, 57, 270, -6, 6, 2.0);
+  xDrive.driveToPose(36, 59, 270, -6, 6, 2.0);
   task t3 = task([]() {
     hoodCylinder.toggle();
     liftCylinders.toggle();
