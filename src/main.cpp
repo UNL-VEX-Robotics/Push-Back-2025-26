@@ -402,9 +402,9 @@ void skills()
   odom.setPose(currentPose.x, 17.5, imu.heading(deg));
 
   xDrive.driveTo(-36, 20, -6, 6, 2);
-  xDrive.driveTo(-36, 0, -6, 6, 2);
-  xDrive.driveTo(-44, 0, -6, 6, 2);
-  xDrive.driveLocal(2, 0, 0, volt);
+  xDrive.driveTo(-36, 1, -6, 6, 2);
+  xDrive.driveTo(-44, 1, -6, 6, 2);
+  xDrive.driveLocal(3, 0, 0, volt);
   task::sleep(1000);
   pokeCylinder.toggle();
   task::sleep(750);
@@ -412,7 +412,7 @@ void skills()
   xDrive.turnTo(90, -3, 3, 2);
   pokeCylinder.toggle();
   task::sleep(250);
-  xDrive.driveLocal(-8, 1, 0, volt);
+  xDrive.driveLocal(-8, 0.5, 0, volt);
   task::sleep(1500);
   xDrive.stop(hold);
 }
@@ -476,7 +476,7 @@ void autonomous(void) {
 
 
 void usercontrol(void) {
-  if (neblib::contains(selector.getAuton(), "skills")) imu.setHeading(270, deg);
+  if (neblib::contains(selector.getAuton(), "skills")) imu.setHeading(0, deg);
 
   neblib::launchTask(std::bind(&Intake::startLoop, &intake));
 
