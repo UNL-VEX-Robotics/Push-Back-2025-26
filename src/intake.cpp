@@ -1,6 +1,6 @@
 #include "intake.hpp"
 
-Intake::Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::Cylinder &lift, neblib::Cylinder &front, vex::optical &colorSensor): topMotor(topMotor), middleMotor(middleMotor), frontMotors(frontMotors), mainMotors(mainMotors), hood(hood), lift(lift), front(front), colorSensor(colorSensor), velocity(0.0), running(false) {}
+Intake::Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::Cylinder &lift, neblib::Cylinder &front, vex::optical &colorSensor): topMotor(topMotor), middleMotor(middleMotor), frontMotors(frontMotors), mainMotors(mainMotors), hood(hood), lift(lift), front(front), colorSensor(colorSensor), velocity(0.0), running(false), frontRunning(true) {}
 
 void Intake::startLoop()
 {
@@ -8,7 +8,10 @@ void Intake::startLoop()
     int msStopped = 0;
     while (running)
     {
-        frontMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+        if (frontRunning)
+            frontMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+        else 
+            frontMotors.stop(vex::brakeType::coast);
         mainMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
 
         // middle motor only if reversed or scoring through top or if velocity can keep up
@@ -40,3 +43,5 @@ void Intake::startLoop()
 void Intake::stopLoop() { running = false; }
 
 void Intake::setSpeed(double velocity) { this->velocity = velocity; }
+
+void Intake::toggleFront(bool toggle) { this->frontRunning = toggle; }

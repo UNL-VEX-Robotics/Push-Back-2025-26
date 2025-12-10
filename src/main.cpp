@@ -383,147 +383,202 @@ void skills()
   odom.setPose(-55.0, -16.5, 270.0);
   vex::task m = vex::task(runMCL);
 
-  // Match Loader 1
+  // Match Load close side
   xDrive.driveToPose(-56.75, -46.25, 270.0, 1.25);
   frontCylinders.toggle();
   xDrive.driveLocal(2, 0, 0, volt);
   intake.setSpeed(100);
-  task::sleep(1000);
+  task::sleep(1500);
   xDrive.stop();
-  task::sleep(1250);
+  frontCylinders.toggle();
+  task::sleep(500);
+  frontCylinders.toggle();
+  task::sleep(1000);
 
   // Score long goal
   frontCylinders.toggle();
-  xDrive.driveTo(-48.5, -46.5, -6, 6, 1.0);
-  liftCylinders.toggle();
-  neblib::Pose currentPose = odom.getPose();
-  xDrive.turnTo(90, 1);
-  intake.setSpeed(0);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  hoodCylinder.toggle();
-  xDrive.driveTo(-31, -46.5, -6, 6, 2);
-  intake.setSpeed(-100.0);
-  task::sleep(75);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-4, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 10);
-  xDrive.stop();
-  task::sleep(2200);
-  xDrive.driveLocal(8, 0, 0, volt);
-  task::sleep(150);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(150);
-  intake.setSpeed(0);
-
-  //Intake under long goal
-  xDrive.driveLocal(0, -8, 0, volt);
-  currentPose = odom.getPose();
-  while (currentPose.y < -35) 
-  {
-    currentPose = odom.getPose();
-    task::sleep(10);
-  }
-  liftCylinders.toggle();
-  hoodCylinder.toggle();
-  xDrive.driveLocal(8, 0, 0, volt);
-  while (currentPose.x < -28) 
-  {
-    currentPose = odom.getPose();
-    task::sleep(10);
-  }
-  intake.setSpeed(0);
-  xDrive.driveToPose(-19.5, -47.275, 95, -4, 4, 2.0);
-  intake.setSpeed(100);
-  xDrive.driveTo(-14.25, -47.25, -4, 4, 1);
-
-  // Far match loader
-  xDrive.driveLocal(2, 8, 0, volt);
-  currentPose = odom.getPose();
-  while (currentPose.y > -55) 
-  {
-    currentPose = odom.getPose();
-    task::sleep(10);
-  }
-  xDrive.driveTo(36, -60, -6, 6, 1);
-  xDrive.driveTo(46, -47, -5, 5, 2);
-  frontCylinders.toggle();
-  xDrive.driveLocal(2, 0, 0, volt);
-  intake.setSpeed(100);
+  xDrive.driveToPose(-36, -57, 270, -6, 6, 1.5);
+  xDrive.driveTo(27, -58, -6, 6, 3);
+  xDrive.driveLocal(0, -4, 0, volt);
   task::sleep(1000);
-  xDrive.stop();
-  task::sleep(1250);
-
-  // Score long goal
-  xDrive.driveTo(40, -48, -5, 5, 2);
-  frontCylinders.toggle();
-  currentPose = odom.getPose();
-  xDrive.turnTo(270, 1);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  auto currentPose = odom.getPose();
+  odom.setPose(currentPose.x, -60, imu.heading(deg));
+  xDrive.driveTo(40, -44.5, -6, 6, 1.5);
   intake.setSpeed(0);
-  task::sleep(20);
-  liftCylinders.toggle();
   hoodCylinder.toggle();
-
-  xDrive.driveTo(20, -47.5, -5, 5, 1.5);
-  intake.setSpeed(-100.0);
-  task::sleep(75);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-4, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 10);
-  xDrive.stop();
-  task::sleep(2200);
-  xDrive.driveLocal(5, 0, 0, volt);
-  task::sleep(200);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(150);
-  xDrive.stop(coast);
-
-  //Intake beneath long goal
-  xDrive.driveLocal(0, -8, 0, volt);
-  currentPose = odom.getPose();
-  while (currentPose.y > -52) 
-  {
-    currentPose = odom.getPose();
-    task::sleep(10);
-  }
   liftCylinders.toggle();
-  hoodCylinder.toggle();
-  xDrive.driveTo(-12, -54, -6, 6, 2);
-  intake.setSpeed(0);
-  frontCylinders.toggle();
-  currentPose = odom.getPose();
-  xDrive.turnTo(0, 1);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(6, -54, -8, 8, 1.0);
-  frontCylinders.toggle();
-  xDrive.driveTo(-7, -54, -6, 6, 1.0);
+  task::sleep(250);
+  xDrive.driveTo(20, -45, -6, 6, 1.5);
   intake.setSpeed(100);
-  xDrive.driveTo(-7, -24, -4, 4, 2.5);
-
-  // Score middle goal
-  xDrive.driveTo(13, -24, -6, 6, 2.5);
-  currentPose = odom.getPose();
-  xDrive.turnTo(315, 1);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  intake.setSpeed(0);
-  hoodCylinder.toggle();
-  xDrive.driveTo(4, -14.25, -6, 6, 2.5);
-  intake.setSpeed(60);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-4, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 10);
-  xDrive.stop();
+  task t0 = task([]() {
+    xDrive.driveLocal(-2, 0, 0, volt);
+    int t = 0;
+    while (thirdStage.velocity(rpm) < 400 && t < 3000)
+    {
+      t += 5;
+      task::sleep(5);
+    }
+    xDrive.stop(hold);
+    return 0;
+  });
   task::sleep(2000);
+  xDrive.driveLocal(6, 0, 0, volt);
+  task::sleep(250);
+  xDrive.driveLocal(-6, 0, 0, volt);
+  task::sleep(250);
+  xDrive.stop(hold);
 
-  // Clear blue zone
-  double xPos = 37;
-  xDrive.driveTo(xPos, -20, -6, 6, 2);
+  // Match load far side
   currentPose = odom.getPose();
-  xDrive.turnTo(90, 1);
+  xDrive.turnTo(90, 2);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  hoodCylinder.toggle();
+  liftCylinders.toggle();
+  task::sleep(250);
+  xDrive.driveTo(44, -42.75, -6, 6, 1.5);
+  xDrive.driveLocal(2.5, 0, 0, volt);
   frontCylinders.toggle();
+  task::sleep(1500);
+  xDrive.stop(hold);
+  frontCylinders.toggle();
+  task::sleep(500);
+  frontCylinders.toggle();
+  task::sleep(1000);
+  frontCylinders.toggle();
+  task::sleep(500);
+  frontCylinders.toggle();
+  task::sleep(1000);
+  frontCylinders.toggle();
+
+  // 2 red off side
+  xDrive.driveTo(33, -44.1, -6, 6, 1.5);
+  currentPose = odom.getPose();
+  xDrive.turnTo(180, 2);
+  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  xDrive.driveTo(35, -60, -6, 6, 1.5);
+  wingCylinder.toggle();
+  task::sleep(250);
+  xDrive.driveLocal(-3, 0, 0, volt);
+  task::sleep(500);
+  currentPose = odom.getPose();
+  xDrive.turnTo(270, -3, 3, 1.5);
+  xDrive.driveLocal(0, -3, 0, volt);
+  task::sleep(1000);
+  odom.setPose(currentPose.x, -60, 274);
+
+  // Score long goal
+  xDrive.driveTo(40, -44.5, -3, 3, 1.5);
+  wingCylinder.toggle();
+  liftCylinders.toggle();
   intake.setSpeed(0);
-  xDrive.driveTo(xPos, 20, -9, 9, 2);
+  hoodCylinder.toggle();
+  task::sleep(250);
+  xDrive.driveTo(18, -45.25, -6, 6, 1.5);
+  xDrive.driveLocal(-2, 0, 0, volt);
+  intake.setSpeed(-80);
+  task::sleep(290);
+  intake.toggleFront(false);
+  task::sleep(10);
+  xDrive.stop(hold);
+  intake.setSpeed(100);
+  task t1 = task([]() {
+    xDrive.driveLocal(-2, 0, 0, volt);
+    int t = 0;
+    while (thirdStage.velocity(rpm) < 400 && t < 3000)
+    {
+      t += 5;
+      task::sleep(5);
+    }
+    xDrive.stop(hold);
+    return 0;
+  });
+  task::sleep(2740);
+  intake.toggleFront(true);
+  xDrive.driveLocal(6, 0, 0, volt);
+  task::sleep(250);
+  xDrive.driveLocal(-6, 0, 0, volt);
+  task::sleep(500);
+  hoodCylinder.toggle();
+  xDrive.stop(hold);
+
+  // Intake under long goal
+  xDrive.driveToPose(36, -58, 270, -6, 6, 1.5);
+  task t3 = task([]() {
+    task::sleep(250);
+    intake.setSpeed(0);
+    liftCylinders.toggle();
+    task::sleep(150);
+    return 0;
+  });
+  xDrive.driveTo(-13, -58, -6, 6, 2);
+  currentPose = odom.getPose();
+  xDrive.turnTo(0, 2);
+  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  xDrive.driveTo(-14.375, -53, -6, 6, 1.5);
+  wingCylinder.toggle();
+  task::sleep(500);
+  intake.setSpeed(100);
+  task::sleep(10);
+  currentPose = odom.getPose();
+  xDrive.turnTo(90, -5, 5, 2);
+  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  xDrive.driveToPose(35, -58, 90, -5, 5, 2);
+  xDrive.driveLocal(0, 3, 0, volt);
+  task::sleep(500);
+  currentPose = odom.getPose();
+  odom.setPose(currentPose.x, -60, imu.heading(deg));
+
+  // clear blue park zone
+  task t4 = task([]() {
+    task::sleep(500);
+    wingCylinder.toggle();
+    return 0;
+  });
+  xDrive.driveTo(currentPose.x - 1.5, 1.5, -6, 6, 2);
+  xDrive.driveLocal(3, 0, 0, volt);
+  task::sleep(750);
+  xDrive.stop(hold);
+  currentPose = odom.getPose();
+  odom.setPose(40, currentPose.y, 90);
+  wingCylinder.toggle();
+  task::sleep(250);
+  xDrive.driveTo(30, currentPose.y, -6, 6, 1.5);
+  xDrive.driveLocal(4.5, 0, 0, volt);
+  task::sleep(250);
+  
+  // score top mid
+  currentPose = odom.getPose();
+  xDrive.turnTo(225, -5, 5, 1);
+  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  xDrive.driveToPose(12, -19.75, 225, -3.5, 3.5, 6);
+  xDrive.turnTo(315, -6, 6, 1.5);
+  xDrive.driveLocal(6, 0, 0, volt);
+  task::sleep(250);
+  intake.setSpeed(0);
+  xDrive.driveLocal(3, 0, 0, volt);
+  task::sleep(10);
+  hoodCylinder.toggle();
+  task::sleep(990);
+  intake.setSpeed(80);
+  task t6 = task([]() {
+    xDrive.driveLocal(-2.5, 0, 0, volt);
+    int t = 0;
+    while (thirdStage.velocity(rpm) < 300 && t < 3000)
+    {
+      t += 5;
+      task::sleep(5);
+    }
+    intake.setSpeed(50);
+    xDrive.stop(hold);
+    return 0;
+  });
+  task::sleep(1000);
+  intake.setSpeed(30);
+  task::sleep(1500);
+  wingCylinder.toggle();
+  xDrive.driveLocal(-10, 4, 0, volt);
+  task::sleep(250);
+  xDrive.stop(coast);
 }
 
 void autonomous(void) {
@@ -607,9 +662,8 @@ void usercontrol(void) {
     if (controller1.ButtonRight.pressing() && !rightWasPressing) 
     {
       wingCylinder.toggle();
-      if (!liftCylinders.getState()) liftCylinders.set(true);
-      if (!frontCylinders.getState()) frontCylinders.set(true);
     }
+    if (controller1.ButtonLeft.pressing()) intakeVelocity = 0.4 * intakeVelocity;
     intake.setSpeed(intakeVelocity);
 
     xDrive.driveGlobal(controller1.Axis3.position(percent) * 0.12, controller1.Axis4.position(percent) * 0.12, controller1.Axis1.position(percent) * 0.12, volt);

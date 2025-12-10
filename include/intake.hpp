@@ -20,6 +20,8 @@ private:
     double velocity;
     bool running;
 
+    bool frontRunning;
+
 public:
     Intake(vex::motor_group &&frontMotors, vex::motor_group &&mainMotors, vex::motor &topMotor, vex::motor &middleMotor, neblib::Cylinder &hood, neblib::Cylinder &lift, neblib::Cylinder &front, vex::optical &colorSensor);
 
@@ -27,4 +29,5 @@ public:
     void stopLoop();
 
     void setSpeed(double velocity);
+    void toggleFront(bool toggle);
 };
