@@ -408,12 +408,12 @@ void skills()
   hoodCylinder.toggle();
   liftCylinders.toggle();
   task::sleep(250);
-  xDrive.driveTo(20, -45, -6, 6, 1.5);
+  xDrive.driveTo(19, -45, -6, 6, 1.5);
   intake.setSpeed(100);
   task t0 = task([]() {
     xDrive.driveLocal(-2, 0, 0, volt);
     int t = 0;
-    while (thirdStage.velocity(rpm) < 400 && t < 3000)
+    while (thirdStage.velocity(rpm) < 250 && t < 3000)
     {
       t += 5;
       task::sleep(5);
@@ -435,7 +435,7 @@ void skills()
   hoodCylinder.toggle();
   liftCylinders.toggle();
   task::sleep(250);
-  xDrive.driveTo(44, -42.75, -6, 6, 1.5);
+  xDrive.driveTo(43, -42.75, -6, 6, 1.5);
   xDrive.driveLocal(2.5, 0, 0, volt);
   frontCylinders.toggle();
   task::sleep(1500);
@@ -475,7 +475,7 @@ void skills()
   task::sleep(250);
   xDrive.driveTo(18, -45.25, -6, 6, 1.5);
   xDrive.driveLocal(-2, 0, 0, volt);
-  intake.setSpeed(-80);
+  intake.setSpeed(-50);
   task::sleep(290);
   intake.toggleFront(false);
   task::sleep(10);
@@ -484,7 +484,7 @@ void skills()
   task t1 = task([]() {
     xDrive.driveLocal(-2, 0, 0, volt);
     int t = 0;
-    while (thirdStage.velocity(rpm) < 400 && t < 3000)
+    while (thirdStage.velocity(rpm) < 300 && t < 3000)
     {
       t += 5;
       task::sleep(5);
@@ -514,7 +514,7 @@ void skills()
   currentPose = odom.getPose();
   xDrive.turnTo(0, 2);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(-14.375, -53, -6, 6, 1.5);
+  xDrive.driveTo(-14.5, -53, -6, 6, 1.5);
   wingCylinder.toggle();
   task::sleep(500);
   intake.setSpeed(100);
@@ -551,9 +551,9 @@ void skills()
   xDrive.turnTo(225, -5, 5, 1);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   xDrive.driveToPose(12, -19.75, 225, -3.5, 3.5, 6);
-  xDrive.turnTo(315, -6, 6, 1.5);
-  xDrive.driveLocal(6, 0, 0, volt);
-  task::sleep(250);
+  xDrive.turnTo(315, -4, 4, 1.5);
+  xDrive.driveLocal(7, 0, 0, volt);
+  task::sleep(150);
   intake.setSpeed(0);
   xDrive.driveLocal(3, 0, 0, volt);
   task::sleep(10);
