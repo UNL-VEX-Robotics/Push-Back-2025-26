@@ -402,13 +402,13 @@ void skills()
   odom.setPose(currentPose.x, 17.5, imu.heading(deg));
 
   xDrive.driveTo(-36, 20, -6, 6, 2);
-  xDrive.driveTo(-36, -2, -6, 6, 2);
-  xDrive.driveTo(-44, -2, -6, 6, 2);
+  xDrive.driveTo(-36, -1.75, -6, 6, 2);
+  xDrive.driveTo(-44, -1.75, -6, 6, 2);
   xDrive.driveLocal(3, 0, 0, volt);
   task::sleep(1000);
   pokeCylinder.toggle();
   task::sleep(750);
-  xDrive.driveTo(-36, 1, -4, 4, 2.5);
+  xDrive.driveTo(-36, -2, -4, 4, 2.5);
   xDrive.turnTo(90, -3, 3, 2);
   pokeCylinder.toggle();
   task::sleep(250);
