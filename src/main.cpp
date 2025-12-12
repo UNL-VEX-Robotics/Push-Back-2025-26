@@ -510,11 +510,11 @@ void skills()
     task::sleep(150);
     return 0;
   });
-  xDrive.driveTo(-13, -58, -6, 6, 1.5);
+  xDrive.driveTo(-13, -58, -6, 6, 2);
   currentPose = odom.getPose();
   xDrive.turnTo(0, 2);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(-12, -53, -6, 6, 1.5);
+  xDrive.driveTo(-8, -53, -6, 6, 1.5);
   wingCylinder.toggle();
   task::sleep(500);
   intake.setSpeed(100);
@@ -550,8 +550,8 @@ void skills()
   currentPose = odom.getPose();
   xDrive.turnTo(225, -5, 5, 1);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveToPose(18, -27.75, 225, -3.5, 3.5, 5);
-  xDrive.driveToPose(12, -19.75, 225, -5, 5, 1.5);
+  xDrive.driveToPose(18, -27.75, 225, -3.5, 3.5, 4);
+  xDrive.driveToPose(11, -19.75, 225, -5, 5, 1.5);
   xDrive.turnTo(315, -4, 4, 1.5);
   xDrive.driveLocal(7, 0, 0, volt);
   task::sleep(150);
