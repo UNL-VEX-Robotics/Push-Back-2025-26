@@ -476,13 +476,14 @@ void skills()
   xDrive.driveTo(18, -44.5, -6, 6, 1.5);
   // xDrive.driveLocal(-2, 0, 0, volt);
   intake.setSpeed(-50);
+  xDrive.driveLocal(-1.5, 0, 0, volt);
   task::sleep(290);
   intake.toggleFront(false);
   task::sleep(10);
   xDrive.stop(hold);
   intake.setSpeed(100);
   task t1 = task([]() {
-    xDrive.driveLocal(-2, 0, 0, volt);
+    xDrive.driveLocal(-3, 0, 0, volt);
     int t = 0;
     while (thirdStage.velocity(rpm) < 300 && t < 3000)
     {
@@ -543,15 +544,15 @@ void skills()
   wingCylinder.toggle();
   task::sleep(250);
   xDrive.driveTo(30, currentPose.y, -6, 6, 1.5);
-  xDrive.driveLocal(4, 0, 0, volt);
-  task::sleep(500);
+  xDrive.driveLocal(3, 0, 0, volt);
+  task::sleep(300);
   
   // score top mid
   currentPose = odom.getPose();
   xDrive.turnTo(225, -4, 4, 1);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   xDrive.driveToPose(18, -27.75, 225, -3.5, 3.5, 4);
-  xDrive.driveToPose(12.25, -19.75, 225, -5, 5, 1.5);
+  xDrive.driveToPose(11.75, -19.75, 225, -5, 5, 1.5);
   xDrive.turnTo(315, -4, 4, 1.5);
   xDrive.driveLocal(7, 0, 0, volt);
   task::sleep(150);
@@ -560,7 +561,7 @@ void skills()
   task::sleep(10);
   hoodCylinder.toggle();
   wingCylinder.toggle();
-  task::sleep(490);
+  task::sleep(740);
   intake.setSpeed(80);
   task t6 = task([]() {
     xDrive.driveLocal(-2.5, 0, 0, volt);
