@@ -264,9 +264,9 @@ void skills()
   frontCylinders.toggle();
   intake.setSpeed(100);
   xDrive.driveLocal(2.5, 0, 0, volt);
-  task::sleep(1000);
+  task::sleep(900);
   xDrive.stop();
-  task::sleep(500);
+  task::sleep(600);
   frontCylinders.toggle();
   task::sleep(500);
   frontCylinders.toggle();
@@ -276,7 +276,7 @@ void skills()
   frontCylinders.toggle();
   xDrive.driveToPose(-28, 57.5, 270, -6, 6, 1.5);
   controller1.Screen.print("Y: %lf", odom.getPose().y);
-  xDrive.driveTo(36, 57, -6, 6, 2.0);
+  xDrive.driveToPose(36, 56, 270, -6, 6, 2.0);
   controller1.Screen.clearLine();
   controller1.Screen.print("Y: %lf", odom.getPose().y);
   xDrive.driveLocal(0, 4, 0, volt);
@@ -289,7 +289,7 @@ void skills()
   task::sleep(10);
   hoodCylinder.toggle();
   task::sleep(100);
-  xDrive.driveTo(29, 43, -6, 6, 1.5);
+  xDrive.driveTo(29, 41.5, -6, 6, 1.5);
   vex::task t1 = vex::task([]() {
     xDrive.driveLocal(-2, 0, 0, volt);
     int t = 0;
