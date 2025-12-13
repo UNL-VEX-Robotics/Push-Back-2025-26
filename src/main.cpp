@@ -260,10 +260,10 @@ void skills()
   vex::task m = vex::task(runMCL);
 
   // Match Loads
-  xDrive.driveToPose(-56.0, 46, 270.0, 1.5);
+  xDrive.driveToPose(-53.5, 46, 270.0, 1.5);
   frontCylinders.toggle();
   intake.setSpeed(100);
-  xDrive.driveLocal(2, 0, 0, volt);
+  xDrive.driveLocal(2.5, 0, 0, volt);
   task::sleep(1000);
   xDrive.stop();
   task::sleep(500);
@@ -289,7 +289,7 @@ void skills()
   task::sleep(10);
   hoodCylinder.toggle();
   task::sleep(100);
-  xDrive.driveTo(29, 44.875, -6, 6, 1.5);
+  xDrive.driveTo(29, 43, -6, 6, 1.5);
   vex::task t1 = vex::task([]() {
     xDrive.driveLocal(-2, 0, 0, volt);
     int t = 0;
@@ -355,7 +355,7 @@ void skills()
   task::sleep(1250);
   currentPose = odom.getPose();
   odom.setPose(currentPose.x, 60, imu.heading(deg));
-  xDrive.driveToPose(currentPose.x, goalY + 1, 270, -4, 4, 3);
+  xDrive.driveToPose(currentPose.x, goalY -2, 270, -4, 4, 3);
   task t4 = task([]() {
     task::sleep(250);
     pokeCylinder.toggle();
@@ -391,7 +391,7 @@ void skills()
     liftCylinders.toggle();
     return 0;
   });
-  xDrive.driveTo(-40, 65, -6, 6, 2);
+  xDrive.driveTo(-40, 67.5, -6, 6, 2);
   xDrive.driveTo(-50, 30, -6, 6, 3);
   intake.setSpeed(0);
   xDrive.driveLocal(5, 0, 0, volt);
