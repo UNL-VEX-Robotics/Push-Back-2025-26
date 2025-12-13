@@ -435,7 +435,7 @@ void skills()
   hoodCylinder.toggle();
   liftCylinders.toggle();
   task::sleep(250);
-  xDrive.driveToPose(43, -42.75, 90, -6, 6, 1.5);
+  xDrive.driveToPose(44, -42, 90, -6, 6, 1.5);
   xDrive.driveLocal(2.5, 0, 0, volt);
   frontCylinders.toggle();
   task::sleep(1500);
@@ -462,19 +462,19 @@ void skills()
   task::sleep(300);
   currentPose = odom.getPose();
   xDrive.turnTo(270, -3, 3, 1.5);
-  xDrive.driveLocal(0, -3, 0, volt);
+  xDrive.driveLocal(0, -4, 0, volt);
   task::sleep(1000);
   odom.setPose(currentPose.x, -60, 274);
 
   // Score long goal
-  xDrive.driveTo(40, -44.5, -3, 3, 1.5);
+  xDrive.driveTo(40, -44.5, -4.5, 4.5, 1.5);
   wingCylinder.toggle();
   liftCylinders.toggle();
   intake.setSpeed(0);
   hoodCylinder.toggle();
   task::sleep(250);
-  xDrive.driveTo(18, -45.25, -6, 6, 1.5);
-  xDrive.driveLocal(-2, 0, 0, volt);
+  xDrive.driveTo(18, -44.5, -6, 6, 1.5);
+  // xDrive.driveLocal(-2, 0, 0, volt);
   intake.setSpeed(-50);
   task::sleep(290);
   intake.toggleFront(false);
@@ -514,7 +514,7 @@ void skills()
   currentPose = odom.getPose();
   xDrive.turnTo(0, 2);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(-8, -53, -6, 6, 1.5);
+  xDrive.driveTo(-12.5, -53, -6, 6, 2);
   wingCylinder.toggle();
   task::sleep(500);
   intake.setSpeed(100);
@@ -543,15 +543,15 @@ void skills()
   wingCylinder.toggle();
   task::sleep(250);
   xDrive.driveTo(30, currentPose.y, -6, 6, 1.5);
-  xDrive.driveLocal(4.5, 0, 0, volt);
-  task::sleep(250);
+  xDrive.driveLocal(4, 0, 0, volt);
+  task::sleep(500);
   
   // score top mid
   currentPose = odom.getPose();
-  xDrive.turnTo(225, -5, 5, 1);
+  xDrive.turnTo(225, -4, 4, 1);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   xDrive.driveToPose(18, -27.75, 225, -3.5, 3.5, 4);
-  xDrive.driveToPose(11, -19.75, 225, -5, 5, 1.5);
+  xDrive.driveToPose(12.25, -19.75, 225, -5, 5, 1.5);
   xDrive.turnTo(315, -4, 4, 1.5);
   xDrive.driveLocal(7, 0, 0, volt);
   task::sleep(150);
@@ -559,7 +559,8 @@ void skills()
   xDrive.driveLocal(3, 0, 0, volt);
   task::sleep(10);
   hoodCylinder.toggle();
-  task::sleep(990);
+  wingCylinder.toggle();
+  task::sleep(490);
   intake.setSpeed(80);
   task t6 = task([]() {
     xDrive.driveLocal(-2.5, 0, 0, volt);
@@ -664,7 +665,7 @@ void usercontrol(void) {
     {
       wingCylinder.toggle();
     }
-    if (controller1.ButtonLeft.pressing()) intakeVelocity = 0.4 * intakeVelocity;
+    if (controller1.ButtonLeft.pressing() || controller1.ButtonDown.pressing()) intakeVelocity = 0.4 * intakeVelocity;
     intake.setSpeed(intakeVelocity);
 
     xDrive.driveGlobal(controller1.Axis3.position(percent) * 0.12, controller1.Axis4.position(percent) * 0.12, controller1.Axis1.position(percent) * 0.12, volt);
