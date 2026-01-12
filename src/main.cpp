@@ -289,7 +289,7 @@ void skills()
   task::sleep(10);
   hoodCylinder.toggle();
   task::sleep(100);
-  xDrive.driveTo(29, 41.5, -6, 6, 1.5);
+  xDrive.driveTo(29, 44.375, -6, 6, 1.5);
   vex::task t1 = vex::task([]() {
     xDrive.driveLocal(-2, 0, 0, volt);
     int t = 0;
