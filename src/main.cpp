@@ -269,7 +269,7 @@ void rightMiddle(vex::color c)
   // Remove off-color blocks
   xDrive.driveTo(-50, -46.25, -6, 6, 1.5);
   neblib::Pose currentPose = odom.getPose();
-  xDrive.turnTo(205, 1.0);
+  xDrive.turnTo(315, 1.0);
   intake.setSpeed(-50);
   senseColor(c, 3000);
   vex::task stopIntake([]() { // Set intake to stop
@@ -286,12 +286,12 @@ void rightMiddle(vex::color c)
   xDrive.turnTo(45, 1.5);
   task::sleep(150);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveToPose(-14.25, -12.75, 45, -6.0, 6.0, 2.0);//////////////////
+  xDrive.driveToPose(-14, -11, 45, -6.0, 6.0, 2.0);//////////////////
   intake.setSpeed(-50);
   task::sleep(2000);
 
   // Match loader 2
-  xDrive.driveTo(-57, -46, -6, 6, 1.5);
+  xDrive.driveTo(-57, -48, -6, 6, 1.5);
   intake.setSpeed(100);
   currentPose = odom.getPose();
   xDrive.turnTo(270, 1);
@@ -300,14 +300,14 @@ void rightMiddle(vex::color c)
   xDrive.driveTo(-63, -46, -8, 8, 0.75);
   xDrive.driveLocal(1.5, 0, 0, volt);
   intake.setSpeed(100);
-  task::sleep(750);
-  xDrive.stop();
-  task::sleep(1000);
+  task::sleep(250);
+  xDrive.stop(coast);
+  liftCylinders.toggle();
+  task::sleep(1500);
 
   // Score long goal
   xDrive.driveTo(-35, odom.getPose().y, -6, 6, 1.5);
   frontCylinders.toggle();
-  liftCylinders.toggle();
   task::sleep(150);
   currentPose = odom.getPose();
   xDrive.turnTo(90, 1.5);
@@ -315,7 +315,7 @@ void rightMiddle(vex::color c)
   hoodCylinder.toggle();
   odom.setPose(currentPose.x, -65.4 + rightDistance.objectDistance(inches), 90);
 
-  xDrive.driveTo(-25, -48.5, -5, 5, 2.0);////////////////////////////////////////
+  xDrive.driveTo(-22, -48.25, -5, 5, 1.75);////////////////////////////////////////
   intake.setSpeed(-100.0);
   task::sleep(50);
   intake.setSpeed(100.0);
@@ -385,7 +385,7 @@ void skills()
   // Score long goal
   frontCylinders.toggle();
   xDrive.driveToPose(-36, -57, 270, -6, 6, 1.25);
-  xDrive.driveTo(27, -58, -6, 6, 3);
+  xDrive.driveTo(27, -59, -6, 6, 3);
   xDrive.driveLocal(0, -4, 0, volt);
   task::sleep(1000);
   auto currentPose = odom.getPose();
