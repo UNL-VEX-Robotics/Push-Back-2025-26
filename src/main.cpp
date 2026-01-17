@@ -72,7 +72,6 @@ Intake intake = Intake(vex::motor_group(leftRoller, rightRoller), vex::motor_gro
 neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Red"), {
   neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red AWP"),
   neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Elims"),
-  neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Safe")
 });
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
   neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue AWP"),
@@ -108,6 +107,7 @@ void pre_auton(void) {
 
   imu.calibrate();
   do { task::sleep(2); } while (imu.isCalibrating());
+  imu.setHeading(270, deg);
 
   auto auton = selector.getAuton();
   std::cout << "\n\nAuton: " << auton << "\n\n";
@@ -121,6 +121,16 @@ void pre_auton(void) {
 
   task::sleep(500);
   Brain.Screen.clearScreen(selector.getColor());
+  Brain.Screen.setPenColor(black);
+  Brain.Screen.setFillColor(selector.getColor());
+
+  while (!Brain.Screen.pressing())
+  {
+    Brain.Screen.clearScreen(selector.getColor());
+    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.print(imu.heading(deg));
+    task::sleep(10);
+  }
 }
 
 int runMCL()
@@ -128,13 +138,13 @@ int runMCL()
   while (true)
   {
     neblib::Pose pose = odom.updatePose();
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print(pose.x);
-    Brain.Screen.setCursor(2, 1);
-    Brain.Screen.print(pose.y);
-    Brain.Screen.setCursor(3, 1);
-    Brain.Screen.print(imu.heading(deg));
+    // Brain.Screen.clearScreen();
+    // Brain.Screen.setCursor(1, 1);
+    // Brain.Screen.print(pose.x);
+    // Brain.Screen.setCursor(2, 1);
+    // Brain.Screen.print(pose.y);
+    // Brain.Screen.setCursor(3, 1);
+    // Brain.Screen.print(imu.heading(deg));
     task::sleep(10);
   }
 }
@@ -151,6 +161,16 @@ void senseColor(vex::color c, int timeout)
     
     task::sleep(10);
     t += 10;
+  }
+}
+
+int autoTime = 0;
+int runTimer()
+{
+  while (true)
+  {
+    task::sleep(10);
+    autoTime += 10;
   }
 }
 
@@ -227,10 +247,10 @@ void leftAWP(vex::color c)
   xDrive.stop();
 }
 
-void rightSafe(vex::color c)
+void rightStart(vex::color c)
 {
   // Setup
-  odom.setPose(-55.0, -16.5, 270.0);
+  odom.setPose(-55.0, -65.4 + leftDistance.objectDistance(inches), 270.0);
   vex::task m = vex::task(runMCL);
 
   // Match Loader 1
@@ -241,8 +261,14 @@ void rightSafe(vex::color c)
   task::sleep(1000);
   xDrive.stop();
   task::sleep(1250);
+  frontCylinders.toggle();
+}
 
+void rightMiddle(vex::color c)
+{
   // Remove off-color blocks
+  xDrive.driveTo(-50, -46.25, -6, 6, 1.5);
+  neblib::Pose currentPose = odom.getPose();
   xDrive.turnTo(205, 1.0);
   intake.setSpeed(-50);
   senseColor(c, 3000);
@@ -255,81 +281,31 @@ void rightSafe(vex::color c)
   });
   intake.setSpeed(0);
   task::sleep(10);
-  frontCylinders.toggle();
   
   // Score bottom goal
-  xDrive.driveToPose(-17, -8.25, 45, -6.0, 6.0, 2.0);
+  xDrive.turnTo(45, 1.5);
+  task::sleep(150);
+  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  xDrive.driveToPose(-14.25, -12.75, 45, -6.0, 6.0, 2.0);//////////////////
   intake.setSpeed(-50);
   task::sleep(2000);
 
-  // intake under long goal
-  intake.setSpeed(0);
-  xDrive.driveToPose(-21, -45.5, 95, -5, 5, 2.0);
-  intake.setSpeed(100);
-  xDrive.driveTo(-15, -45.5, -6, 6, 1.0);
-
   // Match loader 2
-  xDrive.driveLocal(-8, 12, 0, volt);
-  neblib::Pose currentPose = odom.getPose();
-  while (currentPose.y > -52) 
-  {
-    currentPose = odom.getPose();
-    task::sleep(10);
-  }
-  // vex::task useArms([]() {
-  //   while (std::abs(imu.heading(deg) - 270) > 10) task::sleep(10);
-  //   frontCylinders.toggle();
-  //   return 0;
-  // });
-  xDrive.driveTo(-58, -44, -6, 6, 1.5);
+  xDrive.driveTo(-57, -46, -6, 6, 1.5);
+  intake.setSpeed(100);
   currentPose = odom.getPose();
   xDrive.turnTo(270, 1);
   odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
   frontCylinders.toggle();
-  xDrive.driveTo(-63, -44, -8, 8, 0.75);
-  xDrive.driveLocal(2, 0, 0, volt);
+  xDrive.driveTo(-63, -46, -8, 8, 0.75);
+  xDrive.driveLocal(1.5, 0, 0, volt);
   intake.setSpeed(100);
-  bool foundOff = false;
-  for (int i = 0; i < 1000; i += 10)
-  {
-    task::sleep(10);
-    if (colorSensor.color() == (c == red ? blue : red))
-    {
-      foundOff = true;
-      break;
-    }
-  }
+  task::sleep(750);
   xDrive.stop();
-  for (int i = 0; i < 1250; i += 10)
-  {
-    task::sleep(10);
-    if (colorSensor.color() == (c == red ? blue : red) || foundOff)
-    {
-      foundOff = true;
-      break;
-    }
-  }
-  xDrive.driveLocal(-6, 0, 0);
-  task::sleep(250);
-
-  // Remove off-color blocks if necessary
-  if (foundOff)
-  {
-    xDrive.turnTo(205, 1.0);
-    intake.setSpeed(-50);
-    senseColor(c, 3000);
-    vex::task stopIntake([]() { // Set intake to stop
-      intake.setSpeed(100);
-      task::sleep(100);
-      intake.setSpeed(0);
-      task::sleep(10);
-      return 0;
-    });
-    intake.setSpeed(0);
-    task::sleep(10);
-  }
+  task::sleep(1000);
 
   // Score long goal
+  xDrive.driveTo(-45, odom.getPose().y, -6, 6, 1.5);
   frontCylinders.toggle();
   liftCylinders.toggle();
   task::sleep(150);
@@ -339,7 +315,7 @@ void rightSafe(vex::color c)
   hoodCylinder.toggle();
   odom.setPose(currentPose.x, currentPose.y, 90);
 
-  xDrive.driveTo(-36.75, -44, -6, 6, 2.0);
+  xDrive.driveTo(-25, -39.5, -5, 5, 2.0);////////////////////////////////////////
   intake.setSpeed(-100.0);
   task::sleep(50);
   intake.setSpeed(100.0);
@@ -351,30 +327,41 @@ void rightSafe(vex::color c)
   task::sleep(150);
   xDrive.driveLocal(-6, 0, 0, volt);
   task::sleep(150);
+  xDrive.stop();
   intake.setSpeed(0);
+}
+
+void rightSafe(vex::color c)
+{
+  rightStart(c);
+  rightMiddle(c);
+  
 }
 
 void rightElims(vex::color c)
 {
-  // Use Wing
-  intake.setSpeed(0);
-  xDrive.driveTo(-38, -30, -6, 6, 2.0);
-  neblib::Pose currentPose = odom.getPose();
-  xDrive.turnTo(270, 1.5);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
+  rightStart(c);
+  rightMiddle(c);
 
-  wingCylinder.toggle();
-  frontCylinders.toggle();
-  xDrive.driveTo(-20, -42, -6, 6, 1.5);
-  xDrive.driveTo(-14.5, -38, 6, 10, 1.0);
-  xDrive.driveLocal(8, 8, 0, volt);
-  task::sleep(250);
-  xDrive.stop(coast);
+  vex::task t0 = vex::task([]() {
+    waitUntil(autoTime > 29875);
+    wingCylinder.set(true);
+    xDrive.driveLocal(0, -12, 0, volt);
+    waitUntil(autoTime > 30000);
+    xDrive.stop(coast);
+    return 0;
+  });
 
+  xDrive.driveLocal(-3, -8, 0, volt);
   wingCylinder.toggle();
-  liftCylinders.toggle();
+  task::sleep(500);
   hoodCylinder.toggle();
-  frontCylinders.toggle();
+  xDrive.driveLocal(8, 0, 0, volt);
+  task::sleep(600);
+  xDrive.driveTo(-20, -36, -6, 6, 1.5);
+  wingCylinder.toggle();
+  xDrive.driveTo(0, odom.getPose().y, -6, 6, 1.5);
+  
 }
 
 void skills()
@@ -585,6 +572,7 @@ void skills()
 }
 
 void autonomous(void) {
+  vex::task t = vex::task(runTimer);
   /* TESTING */
   // imu.calibrate();
   // do { task::sleep(5); } while (imu.isCalibrating());
@@ -600,15 +588,11 @@ void autonomous(void) {
   vex::color c = selector.getColor();
 
   int startTime = Brain.Timer.time();
-  if (neblib::contains(auton, "AWP")) leftAWP(c);
+  if (neblib::contains(auton, "AWP")) rightSafe(c);
   else if (neblib::contains(auton, "Elims")) 
   {
-    std::cout << "\n\nRunning Elims\n\n";
-    rightSafe(c);
-    std::cout << "\n\nUsing Wing\n\n";
     rightElims(c);
   }
-  else if (neblib::contains(auton, "Safe")) rightSafe(c);
   else if (neblib::contains(auton, "Skills")) skills();
   else 
   {
