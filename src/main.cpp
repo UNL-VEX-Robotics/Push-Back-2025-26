@@ -305,7 +305,7 @@ void rightMiddle(vex::color c)
   task::sleep(1000);
 
   // Score long goal
-  xDrive.driveTo(-45, odom.getPose().y, -6, 6, 1.5);
+  xDrive.driveTo(-35, odom.getPose().y, -6, 6, 1.5);
   frontCylinders.toggle();
   liftCylinders.toggle();
   task::sleep(150);
@@ -313,9 +313,9 @@ void rightMiddle(vex::color c)
   xDrive.turnTo(90, 1.5);
   intake.setSpeed(0);
   hoodCylinder.toggle();
-  odom.setPose(currentPose.x, currentPose.y, 90);
+  odom.setPose(currentPose.x, -65.4 + rightDistance.objectDistance(inches), 90);
 
-  xDrive.driveTo(-25, -39.5, -5, 5, 2.0);////////////////////////////////////////
+  xDrive.driveTo(-25, -48.5, -5, 5, 2.0);////////////////////////////////////////
   intake.setSpeed(-100.0);
   task::sleep(50);
   intake.setSpeed(100.0);
@@ -358,7 +358,7 @@ void rightElims(vex::color c)
   hoodCylinder.toggle();
   xDrive.driveLocal(8, 0, 0, volt);
   task::sleep(600);
-  xDrive.driveTo(-20, -36, -6, 6, 1.5);
+  xDrive.driveTo(-20, -45, -6, 6, 1.5);
   wingCylinder.toggle();
   xDrive.driveTo(0, odom.getPose().y, -6, 6, 1.5);
   
