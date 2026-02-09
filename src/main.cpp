@@ -8,7 +8,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
-#include "neblib/xdrive.hpp"
+#include "neblib/standard_drive.hpp"
+#include "path_generator.hpp"
 #include <iostream>
 
 using namespace vex;
@@ -20,39 +21,22 @@ competition Competition;
 brain Brain;
 controller controller1(primary);
 
-vex::motor LFT = vex::motor(PORT12, ratio6_1, false);
-vex::motor LFB = vex::motor(PORT13, ratio6_1, true);
-vex::motor RFT = vex::motor(PORT3, ratio6_1, true);
-vex::motor RFB = vex::motor(PORT2, ratio6_1, false);
-vex::motor LBT = vex::motor(PORT14, ratio6_1, false);
-vex::motor LBB = vex::motor(PORT15, ratio6_1, true);
-vex::motor RBT = vex::motor(PORT5, ratio6_1, true);
-vex::motor RBB = vex::motor(PORT4, ratio6_1, false);
+motor leftDrive1(PORT13, ratio6_1, false);
+motor leftDrive2(PORT11, ratio6_1, true);
+motor leftDrive3(PORT18, ratio6_1, true);
+motor leftDrive4(PORT19, ratio6_1, false);
+motor leftDrive5(PORT20, ratio6_1, true);
 
-vex::rotation parallel(PORT11);
-vex::rotation perpendicular(PORT1);
-vex::inertial imu(PORT16);
-vex::distance dist(PORT17);
+motor rightDrive1(PORT6, ratio6_1, true);
+motor rightDrive2(PORT7, ratio6_1, false);
+motor rightDrive3(PORT8, ratio6_1, false);
+motor rightDrive4(PORT9, ratio6_1, true);
+motor rightDrive5(PORT10, ratio6_1, false);
 
-neblib::MCL mcl(
-    { new neblib::Distance(dist, 0.0, 0.0, 0.0) },
-    std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallel, 2.0)),
-    2.0,
-    std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicular, 2.0)),
-    2.0,
-    imu,
-    100,
-    {
-        neblib::Line(neblib::Point(-72.0, -72.0), neblib::Point(72.0, -72.0)),
-        neblib::Line(neblib::Point(72.0, 72.0), neblib::Point(72.0, -72.0)),
-        neblib::Line(neblib::Point(-72.0, 72.0), neblib::Point(72.0, 72.0)),
-        neblib::Line(neblib::Point(-72.0, 72.0), neblib::Point(-72.0, -72.0))
-    },
-    1.0,
-    0.1
-);
+motor_group leftDrive = vex::motor_group(leftDrive1, leftDrive2, leftDrive3, leftDrive4, leftDrive5);
+motor_group rightDrive = vex::motor_group(rightDrive1, rightDrive2, rightDrive3, rightDrive4, rightDrive5);
 
-neblib::XDrive xDrive(vex::motor_group(LFT, LFB), vex::motor_group(RFT, RFB), vex::motor_group(LBT, LBB), vex::motor_group(RBT, RBB), &mcl, imu);
+
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -64,16 +48,28 @@ neblib::XDrive xDrive(vex::motor_group(LFT, LFB), vex::motor_group(RFT, RFB), ve
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-void pre_auton(void) {
+void pre_auton(void)
+{
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
 
-void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+PathGenerator p(leftDrive, rightDrive, 11.0, 86.39, 20.0);
+
+void autonomous(void)
+{
+  p.followPath({
+    Point(-36, -48, 0),
+    Point(-36, 0, 0),
+    Point(0, 36, 90),
+    Point(36, 0, 180),
+    Point(0, -36, 270),
+    Point(-24, -36, 270),
+    Point(-36, -48, 180)
+  });
+  leftDrive.stop(hold);
+  rightDrive.stop(hold);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -86,37 +82,30 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+double standardizeExp(double input, double exp)
+{
+  return neblib::sign(input) * (std::pow(std::abs(input), exp) / std::pow(100, exp - 1));
+}
 
-void usercontrol(void) {
+void usercontrol(void)
+{
 
-  imu.calibrate();
-  task::sleep(2000);
-
-  mcl.setPose(-48.0, -24.0, 270);
-  int time = Brain.Timer.time();
- 
   while (true)
   {
-    mcl.update();
-    neblib::Pose e = mcl.getPose();
+    double leftOutput = standardizeExp(controller1.Axis3.position(percent), 1) + standardizeExp(controller1.Axis1.position(percent), 1) * 0.7;
+    double rightOutput = standardizeExp(controller1.Axis3.position(percent), 1) - standardizeExp(controller1.Axis1.position(percent), 1) * 0.7;
+    leftDrive.spin(forward, 0.12 * leftOutput, volt);
+    rightDrive.spin(forward, 0.12 * rightOutput, volt);
+    if (leftOutput == 0) leftDrive.stop(hold);
+    if (rightOutput == 0) rightDrive.stop(hold);
+
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("x: ");
-    Brain.Screen.print(e.x);
+    Brain.Screen.print("Wattage: ");
+    Brain.Screen.print(leftDrive.power());
+    Brain.Screen.print(", ");
+    Brain.Screen.print(rightDrive.power());
 
-    Brain.Screen.setCursor(2, 1);
-    Brain.Screen.print("y: ");
-    Brain.Screen.print(e.y);
-
-    Brain.Screen.setCursor(3, 1);
-    Brain.Screen.print("h: ");
-    Brain.Screen.print(e.heading);
-
-    Brain.Screen.setCursor(4, 1);
-    Brain.Screen.print("t: ");
-    Brain.Screen.print(Brain.Timer.time() - time);
-    time = Brain.Timer.time();
-    
     task::sleep(10);
   }
 }
@@ -124,7 +113,8 @@ void usercontrol(void) {
 //
 // Main will set up the competition functions and callbacks.
 //
-int main() {
+int main()
+{
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
@@ -133,8 +123,8 @@ int main() {
   pre_auton();
 
   // Prevent main from exiting with an infinite loop.
-  while (true) {
+  while (true)
+  {
     wait(100, msec);
   }
 }
-

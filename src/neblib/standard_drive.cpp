@@ -1,6 +1,6 @@
 #include "neblib/standard_drive.hpp"
 
-neblib::StandardDrive::StandardDrive(vex::motor_group&& leftMotors, vex::motor_group&& rightMotors, PositionTracking* positionTracking, TrackerWheel &parallelTrackerWheel, vex::inertial &imu) : leftMotors(leftMotors), rightMotors(rightMotors), positionTracking(positionTracking), parallelTrackerWheel(parallelTrackerWheel), imu(imu), turnPID(nullptr), linearPID(nullptr), angularPID(nullptr), swingPID(nullptr)
+neblib::StandardDrive::StandardDrive(vex::motor_group &leftMotors, vex::motor_group &rightMotors, PositionTracking* positionTracking, TrackerWheel &parallelTrackerWheel, vex::inertial &imu) : leftMotors(leftMotors), rightMotors(rightMotors), positionTracking(positionTracking), parallelTrackerWheel(parallelTrackerWheel), imu(imu), turnPID(nullptr), linearPID(nullptr), angularPID(nullptr), swingPID(nullptr)
 {
 }
 

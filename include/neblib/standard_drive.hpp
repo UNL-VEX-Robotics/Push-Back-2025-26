@@ -9,8 +9,8 @@ namespace neblib
     class StandardDrive
     {
     private:
-        vex::motor_group leftMotors;
-        vex::motor_group rightMotors;
+        vex::motor_group &leftMotors;
+        vex::motor_group &rightMotors;
 
         PositionTracking* positionTracking;
 
@@ -23,7 +23,7 @@ namespace neblib
         PID* swingPID;
 
     public:
-        StandardDrive(vex::motor_group&& leftMotors, vex::motor_group&& rightMotors, PositionTracking* positionTracking, TrackerWheel &parallelTrackerWheel, vex::inertial &imu);
+        StandardDrive(vex::motor_group &leftMotors, vex::motor_group &rightMotors, PositionTracking* positionTracking, TrackerWheel &parallelTrackerWheel, vex::inertial &imu);
 
         void setTurnPID(PID* turnPID);
         void setLinearPID(PID* linearPID);
