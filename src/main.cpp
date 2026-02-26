@@ -70,12 +70,12 @@ neblib::XDrive xDrive = neblib::XDrive(vex::motor_group(frontLeftTop, frontLeftB
 Intake intake = Intake(vex::motor_group(leftRoller, rightRoller), vex::motor_group(firstStage), thirdStage, secondStage, hoodCylinder, liftCylinders, frontCylinders, colorSensor);
 
 neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Red"), {
-  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red AWP"),
-  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Elims"),
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red AWP"),
+  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red Elims"),
 });
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
-  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue AWP"),
-  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue Elims")
+  neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue AWP"),
+  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue Elims")
 });
 neblib::Page skillsPage = neblib::Page(neblib::Button(320, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Skills"), {
   neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Skills")
@@ -174,402 +174,113 @@ int runTimer()
   }
 }
 
-void leftAWP(vex::color c)
+
+void leftSafe(vex::color c)
 {
-  odom.setPose(-55.0, 16.5, 270.0);
+  odom.setPose(-55.0, 65.4 - rightDistance.objectDistance(inches), 270.0);
   vex::task m = vex::task(runMCL);
 
   // Match Loads
-  xDrive.driveToPose(-57.0, 46.25, 270.0, 1.5);
+  xDrive.driveToPose(-57.0, 46.5, 270.0, 1.5);
   frontCylinders.toggle();
   xDrive.driveLocal(2, 0, 0, volt);
   intake.setSpeed(100);
   task::sleep(1000);
   xDrive.stop();
-  task::sleep(2000);
-  
+  task::sleep(1000);
+
+  // Score upper middle goal
+  xDrive.driveTo(-45, 46.25, 1.0);
+  auto curPose = odom.getPose();
+  xDrive.turnTo(135, 1.0);
   frontCylinders.toggle();
   intake.setSpeed(0);
+  odom.setPose(curPose.x, curPose.y, imu.heading(deg));
+  vex::task([](){
+    task::sleep(500);
+    hoodCylinder.toggle();
+    return 0;
+  });
+  xDrive.driveToPose(-15, 12, 135, -6, 6, 2.25);
+  
+  intake.setSpeed(65);
+  vex::task([](){
+    xDrive.driveLocal(-3, 0, 0, volt);
+    while (thirdStage.velocity(rpm) < 20)
+    {
+      task::sleep(2);
+    }
+    xDrive.stop();
 
-  // Score middle
+    return 0;
+  });
+  senseColor(c == red ? blue : red, 2000);
   hoodCylinder.toggle();
-  xDrive.driveToPose(-11.0, 19.75, 135.0, 2.0);
-  intake.setSpeed(-100.0);
-  task::sleep(100);
-  intake.setSpeed(70.0);
-  xDrive.driveLocal(-2, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 10);
-  xDrive.stop();
-  senseColor(c == red ? blue : red, 3000);
-  hoodCylinder.toggle();
-  intake.setSpeed(-100.0);
-  task::sleep(1250);
+  intake.setSpeed(-100);
 
   // Match Load
-  xDrive.driveToPose(-53.5, 53.0, 270.0, 2.5);
-  intake.setSpeed(100.0);
+  xDrive.driveTo(-40, 46.25, -6, 6, 1.5);
+  curPose = odom.getPose();
+  xDrive.turnTo(270, 1.5);
+  odom.setPose(curPose.x, 64.7 - rightDistance.objectDistance(inches), imu.heading(deg));
+  intake.setSpeed(100);
   frontCylinders.toggle();
-  xDrive.driveLocal(2.0, 0, 0, volt);
-  task::sleep(1000);
-  xDrive.stop();
-  task::sleep(2000);
-  frontCylinders.toggle();
-
-  xDrive.driveToPose(-12.0, 75, 115.0, 2.0);
-  xDrive.driveToPose(-2.0, 62, 115.0, 1.5);
-  xDrive.driveLocal(-4, -12.0, 0.0, volt);
-  task::sleep(250);
-  xDrive.driveToPose(-40.0, 77, 115.0, 2.0);
-  intake.setSpeed(0);
-
-  // Score long
-  liftCylinders.toggle();
-  hoodCylinder.toggle();
-  xDrive.driveToPose(-29.25, 63, 90.0, 1.5);
-  intake.setSpeed(-100.0);
-  task::sleep(150);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-2, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 10);
-  xDrive.stop();
-  task::sleep(3500);
-
-  // Park
-  intake.setSpeed(0);
-  xDrive.driveToPose(-69.0, 42.0, 0.0, 1.5);
-  hoodCylinder.toggle();
-  liftCylinders.toggle();
-
-  xDrive.driveLocal(-12.0, -4.0, 0.0, volt);
-  waitUntil(imu.roll(deg) > -10.0);
-  task::sleep(1500);
-  waitUntil(imu.roll(deg) < -10.0);
-  xDrive.stop();
-}
-
-void rightStart(vex::color c)
-{
-  // Setup
-  odom.setPose(-55.0, -65.4 + leftDistance.objectDistance(inches), 270.0);
-  vex::task m = vex::task(runMCL);
-
-  // Match Loader 1
-  xDrive.driveToPose(-56.75, -46.25, 270.0, 1.25);
-  frontCylinders.toggle();
+  xDrive.driveToPose(-57.0, 46.25, 270.0, 0.75);
   xDrive.driveLocal(2, 0, 0, volt);
-  intake.setSpeed(100);
   task::sleep(1000);
   xDrive.stop();
-  task::sleep(1250);
-  frontCylinders.toggle();
-}
+  task::sleep(1000);
 
-void rightMiddle(vex::color c)
-{
-  // Remove off-color blocks
-  xDrive.driveTo(-50, -46.25, -6, 6, 1.5);
-  neblib::Pose currentPose = odom.getPose();
-  xDrive.turnTo(315, 1.0);
-  intake.setSpeed(-50);
-  senseColor(c, 3000);
-  vex::task stopIntake([]() { // Set intake to stop
-    intake.setSpeed(100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    task::sleep(10);
-    return 0;
-  });
-  intake.setSpeed(0);
-  task::sleep(10);
-  
-  // Score bottom goal
-  xDrive.turnTo(45, 1.5);
-  task::sleep(150);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveToPose(-14, -11, 45, -6.0, 6.0, 2.0);//////////////////
-  intake.setSpeed(-50);
-  task::sleep(2000);
-
-  // Match loader 2
-  xDrive.driveTo(-57, -48, -6, 6, 1.5);
-  intake.setSpeed(100);
-  currentPose = odom.getPose();
-  xDrive.turnTo(270, 1);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  frontCylinders.toggle();
-  xDrive.driveTo(-63, -46, -8, 8, 0.75);
-  xDrive.driveLocal(1.5, 0, 0, volt);
-  intake.setSpeed(100);
-  task::sleep(250);
-  xDrive.stop(coast);
-  liftCylinders.toggle();
-  task::sleep(1500);
 
   // Score long goal
-  xDrive.driveTo(-35, odom.getPose().y, -6, 6, 1.5);
-  frontCylinders.toggle();
-  task::sleep(150);
-  currentPose = odom.getPose();
+  xDrive.driveTo(-40, 46.25, -6, 6, 1.5);
+  intake.setSpeed(0);
+  curPose = odom.getPose();
   xDrive.turnTo(90, 1.5);
-  intake.setSpeed(0);
-  hoodCylinder.toggle();
-  odom.setPose(currentPose.x, -65.4 + rightDistance.objectDistance(inches), 90);
-
-  xDrive.driveTo(-22, -48.25, -5, 5, 1.75);////////////////////////////////////////
-  intake.setSpeed(-100.0);
-  task::sleep(50);
-  intake.setSpeed(100.0);
-  xDrive.driveLocal(-4, 0, 0, volt);
-  waitUntil(thirdStage.velocity(rpm) > 10);
-  xDrive.stop();
-  task::sleep(2200);
-  xDrive.driveLocal(8, 0, 0, volt);
-  task::sleep(150);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(150);
-  xDrive.stop();
-  intake.setSpeed(0);
-}
-
-void rightSafe(vex::color c)
-{
-  rightStart(c);
-  rightMiddle(c);
-  
-}
-
-void rightElims(vex::color c)
-{
-  rightStart(c);
-  rightMiddle(c);
-
-  vex::task t0 = vex::task([]() {
-    waitUntil(autoTime > 29875);
-    wingCylinder.set(true);
-    xDrive.driveLocal(0, -12, 0, volt);
-    waitUntil(autoTime > 30000);
-    xDrive.stop(coast);
-    return 0;
-  });
-
-  xDrive.driveLocal(-3, -8, 0, volt);
-  wingCylinder.toggle();
-  task::sleep(500);
-  hoodCylinder.toggle();
-  xDrive.driveLocal(8, 0, 0, volt);
-  task::sleep(600);
-  xDrive.driveTo(-20, -45, -6, 6, 1.5);
-  wingCylinder.toggle();
-  xDrive.driveTo(0, odom.getPose().y, -6, 6, 1.5);
-  
-}
-
-void skills()
-{
-  // Setup
-  odom.setPose(-55.0, -16.5, 270.0);
-  vex::task m = vex::task(runMCL);
-
-  // Match Load close side
-  xDrive.driveToPose(-56.75, -46.25, 270.0, 1.25);
-  frontCylinders.toggle();
-  xDrive.driveLocal(2, 0, 0, volt);
-  intake.setSpeed(100);
-  task::sleep(1500);
-  xDrive.stop();
-  frontCylinders.toggle();
-  task::sleep(500);
-  frontCylinders.toggle();
-  task::sleep(1000);
-
-  // Score long goal
-  frontCylinders.toggle();
-  xDrive.driveToPose(-36, -57, 270, -6, 6, 1.25);
-  xDrive.driveTo(27, -59, -6, 6, 3);
-  xDrive.driveLocal(0, -4, 0, volt);
-  task::sleep(1000);
-  auto currentPose = odom.getPose();
-  odom.setPose(currentPose.x, -60, imu.heading(deg));
-  xDrive.driveTo(40, -44.5, -6, 6, 1.5);
-  intake.setSpeed(0);
-  hoodCylinder.toggle();
+  odom.setPose(curPose.x, 64.7 - leftDistance.objectDistance(inches), imu.heading(deg));
   liftCylinders.toggle();
-  task::sleep(250);
-  xDrive.driveTo(19, -45, -6, 6, 1.5);
+  hoodCylinder.toggle();
+  frontCylinders.toggle();
+
+  xDrive.driveTo(-26, 48, -6, 6, 1.5);
   intake.setSpeed(100);
-  task t0 = task([]() {
-    xDrive.driveLocal(-2, 0, 0, volt);
-    int t = 0;
-    while (thirdStage.velocity(rpm) < 250 && t < 3000)
+  task::sleep(10);
+  vex::task([](){
+    xDrive.driveLocal(-3, 0, 0, volt);
+    while (thirdStage.velocity(rpm) < 200)
     {
-      t += 5;
-      task::sleep(5);
+      task::sleep(2);
     }
-    xDrive.stop(hold);
+    xDrive.stop();
+
     return 0;
   });
   task::sleep(2000);
-  xDrive.driveLocal(6, 0, 0, volt);
-  task::sleep(250);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(250);
-  xDrive.stop(hold);
 
-  // Match load far side
-  currentPose = odom.getPose();
-  xDrive.turnTo(90, 1.25);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  hoodCylinder.toggle();
-  liftCylinders.toggle();
-  task::sleep(250);
-  xDrive.driveToPose(44, -42, 90, -6, 6, 1.5);
-  xDrive.driveLocal(2.5, 0, 0, volt);
-  frontCylinders.toggle();
-  task::sleep(1500);
-  xDrive.stop(hold);
-  frontCylinders.toggle();
-  task::sleep(375);
-  frontCylinders.toggle();
-  task::sleep(1000);
-  frontCylinders.toggle();
-  task::sleep(375);
-  frontCylinders.toggle();
-  task::sleep(1000);
-  frontCylinders.toggle();
-
-  // 2 red off side
-  xDrive.driveTo(33, -44.1, -6, 6, 1.5);
-  currentPose = odom.getPose();
-  xDrive.turnTo(180, 2);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(35, -60, -6, 6, 1.25); ///
-  wingCylinder.toggle();
-  task::sleep(250);
-  xDrive.driveLocal(-3, 0, 0, volt);
-  task::sleep(300);
-  currentPose = odom.getPose();
-  xDrive.turnTo(270, -3, 3, 1.5);
-  xDrive.driveLocal(0, -4, 0, volt);
-  task::sleep(1000);
-  odom.setPose(currentPose.x, -60, 274);
-
-  // Score long goal
-  xDrive.driveTo(40, -44.5, -4.5, 4.5, 1.5);
-  wingCylinder.toggle();
-  liftCylinders.toggle();
-  intake.setSpeed(0);
-  hoodCylinder.toggle();
-  task::sleep(250);
-  xDrive.driveTo(18, -44.5, -6, 6, 1.5);
-  // xDrive.driveLocal(-2, 0, 0, volt);
-  intake.setSpeed(-50);
-  xDrive.driveLocal(-1.5, 0, 0, volt);
-  task::sleep(290);
-  intake.toggleFront(false);
-  task::sleep(10);
-  xDrive.stop(hold);
-  intake.setSpeed(100);
-  task t1 = task([]() {
-    xDrive.driveLocal(-3, 0, 0, volt);
-    int t = 0;
-    while (thirdStage.velocity(rpm) < 300 && t < 3000)
-    {
-      t += 5;
-      task::sleep(5);
-    }
-    xDrive.stop(hold);
-    return 0;
-  });
-  task::sleep(2740);
-  intake.toggleFront(true);
-  xDrive.driveLocal(6, 0, 0, volt);
-  task::sleep(250);
-  xDrive.driveLocal(-6, 0, 0, volt);
-  task::sleep(500);
-  hoodCylinder.toggle();
-  xDrive.stop(hold);
-
-  // Intake under long goal
-  xDrive.driveToPose(36, -58, 270, -6, 6, 1.5);
-  task t3 = task([]() {
-    task::sleep(250);
-    intake.setSpeed(0);
-    liftCylinders.toggle();
-    task::sleep(150);
-    return 0;
-  });
-  xDrive.driveTo(-13, -58, -6, 6, 2);
-  currentPose = odom.getPose();
-  xDrive.turnTo(0, 2);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveTo(-12, -53, -6, 6, 2);
-  wingCylinder.toggle();
-  task::sleep(500);
-  intake.setSpeed(100);
-  task::sleep(10);
-  currentPose = odom.getPose();
-  xDrive.turnTo(90, -5, 5, 1.5);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveToPose(35, -58, 90, -5, 5, 2.5);
-  xDrive.driveLocal(0, 3, 0, volt);
-  task::sleep(500);
-  currentPose = odom.getPose();
-  odom.setPose(currentPose.x, -60, imu.heading(deg));
-
-  // clear blue park zone
-  task t4 = task([]() {
-    task::sleep(500);
-    wingCylinder.toggle();
-    return 0;
-  });
-  xDrive.driveTo(currentPose.x - 1.5, 2.25, -6, 6, 2); ///
-  xDrive.driveLocal(3, 0, 0, volt);
-  task::sleep(750);
-  xDrive.stop(hold);
-  currentPose = odom.getPose();
-  odom.setPose(40, currentPose.y, 90);
-  wingCylinder.toggle();
-  task::sleep(250);
-  xDrive.driveTo(30, currentPose.y, -6, 6, 1.5);
-  xDrive.driveLocal(3, 0, 0, volt);
-  task::sleep(300);
-  
-  // score top mid
-  currentPose = odom.getPose();
-  xDrive.turnTo(225, -4, 4, 1);
-  odom.setPose(currentPose.x, currentPose.y, imu.heading(deg));
-  xDrive.driveToPose(18, -27.75, 225, -3.5, 3.5, 4);
-  xDrive.driveToPose(11.75, -19.75, 225, -5, 5, 1.5);
-  xDrive.turnTo(315, -4, 4, 1.5);
-  xDrive.driveLocal(7, 0, 0, volt);
-  task::sleep(150);
-  intake.setSpeed(0);
-  xDrive.driveLocal(3, 0, 0, volt);
-  task::sleep(10);
-  hoodCylinder.toggle();
-  wingCylinder.toggle();
-  task::sleep(740);
-  intake.setSpeed(80);
-  task t6 = task([]() {
-    xDrive.driveLocal(-2.5, 0, 0, volt);
-    int t = 0;
-    while (thirdStage.velocity(rpm) < 300 && t < 3000)
-    {
-      t += 5;
-      task::sleep(5);
-    }
-    intake.setSpeed(50);
-    xDrive.stop(hold);
-    return 0;
-  });
-  task::sleep(1000);
-  intake.setSpeed(30);
-  task::sleep(1500);
-  wingCylinder.toggle();
-  xDrive.driveLocal(-10, 4, 0, volt);
-  task::sleep(250);
-  xDrive.stop(coast);
+  xDrive.driveLocal(8, 0, 0, volt);
+  task::sleep(400);
 }
+
+void leftElims(vex::color c)
+{
+  leftSafe(c);
+  intake.setSpeed(0);
+
+  // Wing
+  xDrive.driveToPose(-40, 30, 90, -6, 6, 1.5);
+  xDrive.turnTo(270, 1.0);
+  hoodCylinder.toggle();
+  auto curPose = odom.getPose();
+  odom.setPose(curPose.x, 64.7 - rightDistance.objectDistance(inches), imu.heading(deg));
+  wingCylinder.toggle();
+  xDrive.driveTo(-15, 37.25, -6, 6, 2);
+
+  wingCylinder.toggle();
+  task::sleep(50);
+  auto curY = odom.getPose().y;
+  xDrive.driveTo(-5, curY - 1, -6, 6, 3);
+}
+
 
 void autonomous(void) {
   vex::task t = vex::task(runTimer);
@@ -588,12 +299,18 @@ void autonomous(void) {
   vex::color c = selector.getColor();
 
   int startTime = Brain.Timer.time();
-  if (neblib::contains(auton, "AWP")) rightSafe(c);
-  else if (neblib::contains(auton, "Elims")) 
+  if (neblib::contains(auton, "AWP")) 
   {
-    rightElims(c);
+    leftSafe(c);
+    xDrive.driveTo(-40, 46.25, -6, 6, 0.75);
+    hoodCylinder.toggle();
+    intake.setSpeed(0);
+    xDrive.driveToPose(-26, 48, 90, -6, 6, 1.5);
   }
-  else if (neblib::contains(auton, "Skills")) skills();
+  else if (neblib::contains(auton, "Elims"))
+  {
+    leftElims(c);
+  }
   else 
   {
     controller1.rumble(".");
