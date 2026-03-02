@@ -9,7 +9,7 @@
 
 #include "vex.h"
 #include "neblib/standard_drive.hpp"
-#include "path_generator.hpp"
+#include "intake.hpp"
 #include <iostream>
 
 using namespace vex;
@@ -21,21 +21,10 @@ competition Competition;
 brain Brain;
 controller controller1(primary);
 
-motor leftDrive1(PORT13, ratio6_1, false);
-motor leftDrive2(PORT11, ratio6_1, true);
-motor leftDrive3(PORT18, ratio6_1, true);
-motor leftDrive4(PORT19, ratio6_1, false);
-motor leftDrive5(PORT20, ratio6_1, true);
+vex::motor leverMotor(PORT6, ratio36_1, true);
+vex::motor intakeMotor(PORT13, ratio6_1, true);
 
-motor rightDrive1(PORT6, ratio6_1, true);
-motor rightDrive2(PORT7, ratio6_1, false);
-motor rightDrive3(PORT8, ratio6_1, false);
-motor rightDrive4(PORT9, ratio6_1, true);
-motor rightDrive5(PORT10, ratio6_1, false);
-
-motor_group leftDrive = vex::motor_group(leftDrive1, leftDrive2, leftDrive3, leftDrive4, leftDrive5);
-motor_group rightDrive = vex::motor_group(rightDrive1, rightDrive2, rightDrive3, rightDrive4, rightDrive5);
-
+Lever lever(leverMotor);
 
 
 /*---------------------------------------------------------------------------*/
@@ -51,25 +40,14 @@ motor_group rightDrive = vex::motor_group(rightDrive1, rightDrive2, rightDrive3,
 void pre_auton(void)
 {
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+    // All activities that occur before the competition starts
+    // Example: clearing encoders, setting servo positions, ...
 }
 
-PathGenerator p(leftDrive, rightDrive, 11.0, 86.39, 20.0);
 
 void autonomous(void)
 {
-  p.followPath({
-    Point(-36, -48, 0),
-    Point(-36, 0, 0),
-    Point(0, 36, 90),
-    Point(36, 0, 180),
-    Point(0, -36, 270),
-    Point(-24, -36, 270),
-    Point(-36, -48, 180)
-  });
-  leftDrive.stop(hold);
-  rightDrive.stop(hold);
+    
 }
 
 /*---------------------------------------------------------------------------*/
@@ -84,30 +62,27 @@ void autonomous(void)
 
 double standardizeExp(double input, double exp)
 {
-  return neblib::sign(input) * (std::pow(std::abs(input), exp) / std::pow(100, exp - 1));
+    return neblib::sign(input) * (std::pow(std::abs(input), exp) / std::pow(100, exp - 1));
 }
 
 void usercontrol(void)
 {
+    neblib::launchTask(std::bind(&Lever::startLoop, &lever));
+    while (true)
+    {
+        if (controller1.ButtonR1.pressing())
+            lever.setVelocity(100);
+        else    
+            lever.setVelocity(-100);
 
-  while (true)
-  {
-    double leftOutput = standardizeExp(controller1.Axis3.position(percent), 1) + standardizeExp(controller1.Axis1.position(percent), 1) * 0.7;
-    double rightOutput = standardizeExp(controller1.Axis3.position(percent), 1) - standardizeExp(controller1.Axis1.position(percent), 1) * 0.7;
-    leftDrive.spin(forward, 0.12 * leftOutput, volt);
-    rightDrive.spin(forward, 0.12 * rightOutput, volt);
-    if (leftOutput == 0) leftDrive.stop(hold);
-    if (rightOutput == 0) rightDrive.stop(hold);
-
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("Wattage: ");
-    Brain.Screen.print(leftDrive.power());
-    Brain.Screen.print(", ");
-    Brain.Screen.print(rightDrive.power());
-
-    task::sleep(10);
-  }
+        if (controller1.ButtonL2.pressing())
+            intakeMotor.spin(reverse, 100, percent);
+        else if (controller1.ButtonL1.pressing() && !lever.isUp())
+            intakeMotor.spin(forward, 100, percent);
+        else    
+            intakeMotor.stop(brake);
+        task::sleep(10);
+    }
 }
 
 //
@@ -115,16 +90,16 @@ void usercontrol(void)
 //
 int main()
 {
-  // Set up callbacks for autonomous and driver control periods.
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+    // Set up callbacks for autonomous and driver control periods.
+    Competition.autonomous(autonomous);
+    Competition.drivercontrol(usercontrol);
 
-  // Run the pre-autonomous function.
-  pre_auton();
+    // Run the pre-autonomous function.
+    pre_auton();
 
-  // Prevent main from exiting with an infinite loop.
-  while (true)
-  {
-    wait(100, msec);
-  }
+    // Prevent main from exiting with an infinite loop.
+    while (true)
+    {
+        wait(100, msec);
+    }
 }
