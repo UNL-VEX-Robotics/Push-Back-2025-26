@@ -45,9 +45,13 @@ vex::inertial imu(PORT12);
 
 neblib::StandardDrive standardDrive(leftMotors, rightMotors, nullptr, parallelTrackerWheel, imu);
 
-neblib::Cylinder wing(Brain.ThreeWirePort.F);
-neblib::Cylinder matchload(Brain.ThreeWirePort.G);
-neblib::Cylinder lift(Brain.ThreeWirePort.H);
+vex::led wing(Brain.ThreeWirePort.F);
+vex::led matchload(Brain.ThreeWirePort.G);
+vex::led lift(Brain.ThreeWirePort.H);
+
+neblib::Cylinder wingCylinder(wing);
+neblib::Cylinder matchloadCylinder(matchload);
+neblib::Cylinder liftCylinder(lift);
 
 Lever lever(leverMotor);
 
@@ -112,11 +116,11 @@ void usercontrol(void)
             intakeMotor.stop(brake);
 
         if (controller1.ButtonRight.pressing() && !rightWasPressing)
-            wing.toggle();
+            wingCylinder.toggle();
         if (controller1.ButtonB.pressing() && !bWasPressing)
-            matchload.toggle();
+            matchloadCylinder.toggle();
         if (controller1.ButtonR2.pressing() && !r2WasPressing)
-            lift.toggle();
+            liftCylinder.toggle();
 
         standardDrive.arcadeDrive(controller1.Axis3.position(percent), controller1.Axis1.position(percent) * 0.7, vex::velocityUnits::pct);
 
