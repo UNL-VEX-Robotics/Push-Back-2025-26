@@ -24,6 +24,31 @@ controller controller1(primary);
 vex::motor leverMotor(PORT6, ratio36_1, true);
 vex::motor intakeMotor(PORT13, ratio6_1, true);
 
+vex::motor left1(PORT16, ratio6_1, false);
+vex::motor left2(PORT17, ratio6_1, true);
+vex::motor left3(PORT18, ratio6_1, true);
+vex::motor left4(PORT19, ratio6_1, false);
+vex::motor left5(PORT20, ratio6_1, true);
+vex::motor_group leftMotors(left1, left2, left3, left4, left5);
+
+vex::motor right1(PORT1, ratio6_1, true);
+vex::motor right2(PORT2, ratio6_1, false);
+vex::motor right3(PORT3, ratio6_1, false);
+vex::motor right4(PORT4, ratio6_1, true);
+vex::motor right5(PORT5, ratio6_1, false);
+vex::motor_group rightMotors(right1, right2, right3, right4, right5);
+
+vex::rotation parallelRotation(PORT11);
+neblib::RotationTrackerWheel parallelTrackerWheel(parallelRotation, 2.0);
+
+vex::inertial imu(PORT12);
+
+neblib::StandardDrive standardDrive(leftMotors, rightMotors, nullptr, parallelTrackerWheel, imu);
+
+neblib::Cylinder wing(Brain.ThreeWirePort.F);
+neblib::Cylinder matchload(Brain.ThreeWirePort.G);
+neblib::Cylinder lift(Brain.ThreeWirePort.H);
+
 Lever lever(leverMotor);
 
 
@@ -68,6 +93,10 @@ double standardizeExp(double input, double exp)
 void usercontrol(void)
 {
     neblib::launchTask(std::bind(&Lever::startLoop, &lever));
+
+    bool rightWasPressing = false;
+    bool bWasPressing = false;
+    bool r2WasPressing = false;
     while (true)
     {
         if (controller1.ButtonR1.pressing())
@@ -81,7 +110,21 @@ void usercontrol(void)
             intakeMotor.spin(forward, 100, percent);
         else    
             intakeMotor.stop(brake);
+
+        if (controller1.ButtonRight.pressing() && !rightWasPressing)
+            wing.toggle();
+        if (controller1.ButtonB.pressing() && !bWasPressing)
+            matchload.toggle();
+        if (controller1.ButtonR2.pressing() && !r2WasPressing)
+            lift.toggle();
+
+        standardDrive.arcadeDrive(controller1.Axis3.position(percent), controller1.Axis1.position(percent) * 0.7, vex::velocityUnits::pct);
+
+        r2WasPressing = controller1.ButtonR2.pressing();
+        bWasPressing = controller1.ButtonB.pressing();
+        rightWasPressing = controller1.ButtonRight.pressing();
         task::sleep(10);
+
     }
 }
 

@@ -20,10 +20,10 @@ void Lever::startLoop()
             lever.stop(vex::brakeType::coast);
         }
         else{
-            if (abs(lever.velocity(vex::velocityUnits::pct)) < 0.2 * abs(velocity))
+            if (abs(lever.velocity(vex::velocityUnits::pct)) < 0.05 * abs(velocity))
                 timeStuck += 10;
             
-            if (timeStuck > 100)
+            if (timeStuck > 250)
                 lever.stop(vex::brakeType::brake);
             else
                 lever.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
@@ -40,7 +40,7 @@ void Lever::stopLoop()
 
 bool Lever::isUp()
 {
-    if (velocity < 100 && timeStuck > 100)
+    if (velocity < 250 && timeStuck > 100)
         return false;
     return true;
 }
