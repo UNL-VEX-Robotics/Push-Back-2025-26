@@ -57,7 +57,7 @@ double neblib::PID::getOutput(double error, double minOutput, double maxOutput)
 
     settled = exitConditions->isSettled(error, derivative);
 
-    return neblib::clamp(gains.applyGains(error, derivative, integral), minOutput, maxOutput);
+    return neblib::clamp(gains.applyGains(error, integral, derivative), minOutput, maxOutput);
 }
 
 double neblib::PID::getOutput(double error)

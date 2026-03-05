@@ -1,6 +1,6 @@
 #include "intake.hpp"
 
-#include <iostream>
+#include <cmath>
 
 Lever::Lever(vex::motor &lever)
     : lever(lever),

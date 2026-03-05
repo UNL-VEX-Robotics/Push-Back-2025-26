@@ -42,9 +42,9 @@ namespace neblib
         double turnTo(double heading, double minOutput, double maxOutput, double timeout = infinity());
         double turnTo(double heading, double timeout = infinity());
 
-        double driveFor(double distance, double heading, double minOutput, double maxOutput, double timeout = infinity());
-        double driveFor(double distance, double minOutput, double maxOutput, double timeout = infinity());
-        double driveFor(double distance, double heading, double timeout = infinity());
+        double driveFor(double distance, double heading, double minOutput, double maxOutput, double timeout);
+        double driveFor(double distance, double minOutput, double maxOutput, double timeout);
+        double driveFor(double distance, double heading, double timeout);
         double driveFor(double distance, double timeout = infinity());
 
         double swingFor(vex::turnType direction, double degrees, double minOutput, double maxOutput, double timeout = infinity());
