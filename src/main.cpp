@@ -74,7 +74,8 @@ neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155
                                                                                                                                                                               neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red Elims"),
                                                                                                                                                                               neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Red Quick")});
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue AWP"),
-                                                                                                                                                                                  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue Elims")});
+                                                                                                                                                                                  neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue Elims"),
+                                                                                                                                                                                  neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Blue Quick")});
 neblib::Page skillsPage = neblib::Page(neblib::Button(320, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Skills"), {neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Skills")});
 neblib::AutonSelector selector = neblib::AutonSelector(Brain, {&redPage, &bluePage, &skillsPage}, neblib::Button(180, 120, 120, 50, vex::color(255, 255, 255), vex::color(255, 255, 255), vex::color(0, 0, 0), vex::color(255, 255, 255), "Calibrate"));
 
@@ -181,7 +182,7 @@ void leftSafe(vex::color c)
     vex::task m = vex::task(runMCL);
 
     // Match Loads
-    xDrive.driveToPose(-57.0, 46.5, 270.0, 1.5);
+    xDrive.driveToPose(-57.0, 46.5, 270.0, -8, 8, 1.5);
     frontCylinders.toggle();
     xDrive.driveLocal(2, 0, 0, volt);
     intake.setSpeed(100);
@@ -272,7 +273,7 @@ void leftElims(vex::color c)
     auto curPose = odom.getPose();
     odom.setPose(curPose.x, 64.7 - rightDistance.objectDistance(inches), imu.heading(deg));
     wingCylinder.toggle();
-    xDrive.driveTo(-15, 37.25, -6, 6, 2);
+    xDrive.driveTo(-20, 36.75, -6, 6, 2);
 
     wingCylinder.toggle();
     task::sleep(50);
@@ -286,7 +287,7 @@ void leftQuick(vex::color c)
     vex::task m = vex::task(runMCL);
 
     // Match Loads
-    xDrive.driveToPose(-57.0, 46.5, 270.0, 1.5);
+    xDrive.driveToPose(-57.0, 46.5, 270.0, -8, 8, 1.5);
     frontCylinders.toggle();
     xDrive.driveLocal(2, 0, 0, volt);
     intake.setSpeed(100);
@@ -329,7 +330,7 @@ void leftQuick(vex::color c)
     curPose = odom.getPose();
     odom.setPose(curPose.x, 64.7 - rightDistance.objectDistance(inches), imu.heading(deg));
     wingCylinder.toggle();
-    xDrive.driveTo(-15, 37.25, -6, 6, 2);
+    xDrive.driveTo(-20, 36.75, -6, 6, 2);
 
     wingCylinder.toggle();
     task::sleep(50);
