@@ -130,7 +130,7 @@ void rightAWP()
     liftCylinder.toggle();
     standardDrive.driveFor(18.5, 2);
     intakeMotor.spin(reverse, 100, percent);
-    task::sleep(1500);
+    task::sleep(1333);
 
     // Matchload
     vex::task([](){
@@ -147,7 +147,7 @@ void rightAWP()
 
     // Score Long goal
     standardDrive.driveFor(-26, 272, 1.5);
-    lever.setVelocity(80);
+    lever.setVelocity(70);
     task::sleep(250);
     intakeMotor.spin(reverse, 100, percent);
     task::sleep(1500);
@@ -204,6 +204,19 @@ void rightMany()
     intakeMotor.spin(reverse, 100, percent);
 }
 
+void rightElims()
+{
+    task::sleep(1000);
+    wingCylinder.toggle();
+    standardDrive.swingFor(right, 180, 2);
+    standardDrive.driveFor(10);
+    standardDrive.swingFor(right, 35, 2);
+    standardDrive.driveFor(8);
+    standardDrive.swingTo(left, 90, 2);
+    wingCylinder.toggle();
+    standardDrive.driveFor(8);
+}
+
 void autonomous(void)
 {
     auto auton = selector.getAuton();
@@ -216,6 +229,11 @@ void autonomous(void)
         rightAWP();
     else if (neblib::contains(auton, "Safe"))
         rightSafe();
+    else if (neblib::contains(auton, "Elims"))
+    {
+        rightAWP();
+        rightElims();
+    }
     else if (neblib::contains(auton, "Many"))
     {
         rightAWP();
