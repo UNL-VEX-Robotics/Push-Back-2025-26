@@ -138,16 +138,16 @@ void rightAWP()
         matchloadCylinder.toggle();
         return 0;
     });
-    standardDrive.driveFor(-44, 2);
+    standardDrive.driveFor(-47, 2);
     standardDrive.turnTo(270, 2);
     intakeMotor.spin(forward, 100, percent);
-    int totalTime = 1333;
-    double t = standardDrive.driveFor(10.4, 3, 6, 0.001 * totalTime);
+    int totalTime = 1500;
+    double t = standardDrive.driveFor(9, 3, 6, 0.001 * totalTime);
     task::sleep(totalTime - int(1000.0 * t));
 
     // Score Long goal
     standardDrive.driveFor(-26, 272, 1.5);
-    lever.setVelocity(35);
+    lever.setVelocity(80);
     task::sleep(250);
     intakeMotor.spin(reverse, 100, percent);
     task::sleep(1500);
@@ -169,16 +169,16 @@ void rightSafe()
         matchloadCylinder.toggle();
         return 0;
     });
-    standardDrive.driveFor(-44, 2);
+    standardDrive.driveFor(-47, 2);
     standardDrive.turnTo(270, 2);
     intakeMotor.spin(forward, 100, percent);
     int totalTime = 1285;
-    double t = standardDrive.driveFor(10.4, 3, 6, 0.001 * totalTime);
+    double t = standardDrive.driveFor(9, 3, 6, 0.001 * totalTime);
     task::sleep(totalTime - int(1000.0 * t));
 
     // Score Long goal
-    standardDrive.driveFor(-26, 272, 1.5);
-    lever.setVelocity(35);
+    standardDrive.driveFor(-26, 271, 1.5);
+    lever.setVelocity(80);
     task::sleep(250);
     intakeMotor.spin(reverse, 100, percent);
 }
@@ -266,7 +266,7 @@ void usercontrol(void)
 
         if (controller1.ButtonRight.pressing() && !rightWasPressing)
             wingCylinder.toggle();
-        if (controller1.ButtonB.pressing() && !bWasPressing)
+        if (controller1.ButtonY.pressing() && !bWasPressing)
             matchloadCylinder.toggle();
         if (controller1.ButtonR2.pressing() && !r2WasPressing)
             liftCylinder.toggle();
@@ -276,7 +276,7 @@ void usercontrol(void)
             standardDrive.stop(hold);
 
         r2WasPressing = controller1.ButtonR2.pressing();
-        bWasPressing = controller1.ButtonB.pressing();
+        bWasPressing = controller1.ButtonY.pressing();
         rightWasPressing = controller1.ButtonRight.pressing();
         task::sleep(10);
     }
