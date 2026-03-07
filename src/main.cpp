@@ -182,7 +182,7 @@ void leftSafe(vex::color c)
     vex::task m = vex::task(runMCL);
 
     // Match Loads
-    xDrive.driveToPose(-57.0, 46.5, 270.0, -8, 8, 1.5);
+    xDrive.driveToPose(-56, 46.5, 270.0, -7, 7, 1.5);
     frontCylinders.toggle();
     xDrive.driveLocal(2, 0, 0, volt);
     intake.setSpeed(100);
@@ -202,12 +202,12 @@ void leftSafe(vex::color c)
     task::sleep(500);
     hoodCylinder.toggle();
     return 0; });
-    xDrive.driveToPose(-15, 12, 135, -6, 6, 2.25);
+    xDrive.driveToPose(-11, 12, 135, -6, 6, 2.25);
 
     intake.setSpeed(65);
     vex::task([]()
               {
-    xDrive.driveLocal(-3, 0, 0, volt);
+    xDrive.driveLocal(-4.5, 0, 0, volt);
     while (thirdStage.velocity(rpm) < 20)
     {
       task::sleep(2);
@@ -223,7 +223,7 @@ void leftSafe(vex::color c)
     xDrive.driveTo(-40, 46.25, -6, 6, 1.5);
     curPose = odom.getPose();
     xDrive.turnTo(270, 1.5);
-    odom.setPose(curPose.x, 64.7 - rightDistance.objectDistance(inches), imu.heading(deg));
+    odom.setPose(curPose.x, 67 - rightDistance.objectDistance(inches), imu.heading(deg));
     intake.setSpeed(100);
     frontCylinders.toggle();
     xDrive.driveToPose(-57.0, 46.25, 270.0, 0.75);
@@ -237,7 +237,7 @@ void leftSafe(vex::color c)
     intake.setSpeed(0);
     curPose = odom.getPose();
     xDrive.turnTo(90, 1.5);
-    odom.setPose(curPose.x, 64.7 - leftDistance.objectDistance(inches), imu.heading(deg));
+    odom.setPose(curPose.x, 67 - leftDistance.objectDistance(inches), imu.heading(deg));
     liftCylinders.toggle();
     hoodCylinder.toggle();
     frontCylinders.toggle();
@@ -247,7 +247,7 @@ void leftSafe(vex::color c)
     task::sleep(10);
     vex::task([]()
               {
-    xDrive.driveLocal(-3, 0, 0, volt);
+    xDrive.driveLocal(-4.5, 0, 0, volt);
     while (thirdStage.velocity(rpm) < 200)
     {
       task::sleep(2);
@@ -287,7 +287,7 @@ void leftQuick(vex::color c)
     vex::task m = vex::task(runMCL);
 
     // Match Loads
-    xDrive.driveToPose(-57.0, 46.5, 270.0, -8, 8, 1.5);
+    xDrive.driveToPose(-56, 46.5, 270.0, -7, 7, 1.5);
     frontCylinders.toggle();
     xDrive.driveLocal(2, 0, 0, volt);
     intake.setSpeed(100);
@@ -310,7 +310,7 @@ void leftQuick(vex::color c)
     task::sleep(10);
     vex::task([]()
               {
-    xDrive.driveLocal(-3, 0, 0, volt);
+    xDrive.driveLocal(-4.5, 0, 0, volt);
     while (thirdStage.velocity(rpm) < 200)
     {
       task::sleep(2);
@@ -355,7 +355,7 @@ void skills()
     xDrive.driveLocal(-6, 0, 0, volt);
     task::sleep(100);
     xDrive.driveTo(-24, -24, -6, 6, 1.25);
-    xDrive.driveTo(-54, -45, -6, 6, 1.25);
+    xDrive.driveTo(-54, -43, -6, 6, 1.25);
     auto curPose = odom.getPose();
     odom.setPose(curPose.x, -65.7 + leftDistance.objectDistance(inches), imu.heading(deg));\
     frontCylinders.toggle();
@@ -375,7 +375,7 @@ void skills()
     frontCylinders.toggle();
     xDrive.driveTo(-26, -47, -6, 6, 1.25);
     task([](){
-        xDrive.driveLocal(-3, 0, 0, volt);
+        xDrive.driveLocal(-4.5, 0, 0, volt);
         waitUntil(thirdStage.velocity(percent) > 10);
         task::sleep(50);
         xDrive.stop(hold);
@@ -410,10 +410,10 @@ void skills()
     xDrive.driveLocal(0, -6, 0, volt);
     task::sleep(250);
     hoodCylinder.toggle();
-    xDrive.driveTo(-17.5, 8.5, -5, 5, 2);
+    xDrive.driveTo(-16.75, 9, -5, 5, 2);
     intake.setSpeed(45);
     task([](){
-        xDrive.driveLocal(-3, 0, 0, volt);
+        xDrive.driveLocal(-4.5, 0, 0, volt);
         waitUntil(thirdStage.velocity(percent) > 10);
         xDrive.stop(hold);
         return 0;
@@ -428,7 +428,7 @@ void skills()
     curPose = odom.getPose();
     xDrive.turnTo(90, 1);
     odom.setPose(curPose.x, -65.7 + rightDistance.objectDistance(inches), imu.heading(deg));
-    xDrive.driveTo(36, 0.5, -6, 6, 2); 
+    xDrive.driveTo(36, 1.25, -6, 6, 2); 
     xDrive.driveLocal(3, 0, 0, volt);
     task::sleep(750);
     xDrive.stop(hold);
@@ -478,7 +478,7 @@ void skills()
     hoodCylinder.toggle();
     xDrive.driveTo(26, -50, -6, 6, 1.25);
     task([](){
-        xDrive.driveLocal(-3, 0, 0, volt);
+        xDrive.driveLocal(-4.5, 0, 0, volt);
         waitUntil(thirdStage.velocity(percent) > 10);
         xDrive.stop(hold);
         return 0;
