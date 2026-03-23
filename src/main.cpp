@@ -217,6 +217,12 @@ void rightElims()
     standardDrive.driveFor(8);
 }
 
+void skills()
+{
+    intakeMotor.spin(forward, 100, percent);
+    wingCylinder.toggle();
+}
+
 void autonomous(void)
 {
     auto auton = selector.getAuton();
@@ -236,8 +242,12 @@ void autonomous(void)
     }
     else if (neblib::contains(auton, "Many"))
     {
-        rightAWP();
-        rightMany();
+        rightSafe();
+        rightElims();
+    }
+    else if (neblib::contains(auton, "Skills"))
+    {
+        skills();
     }
     
     lever.stopLoop();
