@@ -226,7 +226,7 @@ void leftSafe(vex::color c)
     odom.setPose(curPose.x, 67 - rightDistance.objectDistance(inches), imu.heading(deg));
     intake.setSpeed(100);
     frontCylinders.toggle();
-    xDrive.driveToPose(-57.0, 46.25, 270.0, 0.75);
+    xDrive.driveToPose(-57.0, 45.5, 270.0, 0.75);
     xDrive.driveLocal(2, 0, 0, volt);
     task::sleep(1000);
     xDrive.stop();
@@ -237,12 +237,12 @@ void leftSafe(vex::color c)
     intake.setSpeed(0);
     curPose = odom.getPose();
     xDrive.turnTo(90, 1.5);
-    odom.setPose(curPose.x, 67 - leftDistance.objectDistance(inches), imu.heading(deg));
+    odom.setPose(curPose.x, 65.5 - leftDistance.objectDistance(inches), imu.heading(deg));
     liftCylinders.toggle();
     hoodCylinder.toggle();
     frontCylinders.toggle();
 
-    xDrive.driveTo(-26, 48, -6, 6, 1.5);
+    xDrive.driveTo(-22, 48, -6, 6, 1.5);
     intake.setSpeed(100);
     task::sleep(10);
     vex::task([]()
@@ -330,7 +330,7 @@ void leftQuick(vex::color c)
     curPose = odom.getPose();
     odom.setPose(curPose.x, 64.7 - rightDistance.objectDistance(inches), imu.heading(deg));
     wingCylinder.toggle();
-    xDrive.driveTo(-20, 36.75, -6, 6, 2);
+    xDrive.driveTo(-20, 37.75, -6, 6, 2);
 
     wingCylinder.toggle();
     task::sleep(50);
