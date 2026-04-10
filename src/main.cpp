@@ -2,13 +2,15 @@
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       closm                                                     */
-/*    Created:      5/22/2025, 10:39:20 AM                                    */
+/*    Created:      5/21/2025, 1:14:46 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
 #include "neblib/xdrive.hpp"
+#include "neblib/devices/tracker_wheel.hpp"
+#include "neblib/auton_selector.hpp"
 #include <iostream>
 
 using namespace vex;
@@ -18,42 +20,72 @@ competition Competition;
 
 // define your global instances of motors and other devices here
 brain Brain;
-controller controller1(primary);
 
-vex::motor LFT = vex::motor(PORT12, ratio6_1, false);
-vex::motor LFB = vex::motor(PORT13, ratio6_1, true);
-vex::motor RFT = vex::motor(PORT3, ratio6_1, true);
-vex::motor RFB = vex::motor(PORT2, ratio6_1, false);
-vex::motor LBT = vex::motor(PORT14, ratio6_1, false);
-vex::motor LBB = vex::motor(PORT15, ratio6_1, true);
-vex::motor RBT = vex::motor(PORT5, ratio6_1, true);
-vex::motor RBB = vex::motor(PORT4, ratio6_1, false);
+vex::controller controller1(primary);
 
-vex::rotation parallel(PORT11);
-vex::rotation perpendicular(PORT1);
-vex::inertial imu(PORT16);
-vex::distance dist(PORT17);
+vex::motor frontLeftTop = vex::motor(PORT1, ratio6_1, false);
+vex::motor frontLeftBottom = vex::motor(PORT2, ratio6_1, true);
+vex::motor frontRightTop = vex::motor(PORT4, ratio6_1, true);
+vex::motor frontRightBottom = vex::motor(PORT3, ratio6_1, false);
+vex::motor backLeftTop = vex::motor(PORT18, ratio6_1, false);
+vex::motor backLeftBottom = vex::motor(PORT17, ratio6_1, true);
+vex::motor backRightTop = vex::motor(PORT13, ratio6_1, true);
+vex::motor backRightBottom = vex::motor(PORT12, ratio6_1, false);
 
-neblib::MCL mcl(
-    { new neblib::Distance(dist, 0.0, 0.0, 0.0) },
-    std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(parallel, 2.0)),
-    2.0,
-    std::unique_ptr<neblib::TrackerWheel>(new neblib::RotationTrackerWheel(perpendicular, 2.0)),
-    2.0,
+vex::motor_group leftFront(frontLeftTop, frontLeftBottom);
+vex::motor_group rightFront(frontRightTop, frontRightBottom);
+vex::motor_group leftBack(backLeftTop, backLeftBottom);
+vex::motor_group rightBack(backRightTop, backRightBottom);
+
+vex::inertial imu(PORT10, vex::turnType::right);
+vex::rotation parallelRotation(PORT6, true); // 6
+vex::rotation perpendicularRotation(PORT8, true); //8
+
+neblib::RotationTrackerWheel parallel(
+    parallelRotation,
+    2.05);
+neblib::RotationTrackerWheel perpendicular(
+    perpendicularRotation,
+    2.0119);
+
+neblib::Odometry odom(
+    parallel,
+    -4.0, // -4.0
+    perpendicular,
+    0.0, //0.0
+    imu);
+neblib::XDrive xDrive(
+    leftFront,
+    rightFront,
+    leftBack,
+    rightBack,
     imu,
-    100,
-    {
-        neblib::Line(neblib::Point(-72.0, -72.0), neblib::Point(72.0, -72.0)),
-        neblib::Line(neblib::Point(72.0, 72.0), neblib::Point(72.0, -72.0)),
-        neblib::Line(neblib::Point(-72.0, 72.0), neblib::Point(72.0, 72.0)),
-        neblib::Line(neblib::Point(-72.0, 72.0), neblib::Point(-72.0, -72.0))
-    },
-    1.0,
-    0.1
-);
+    &odom);
 
-neblib::XDrive xDrive(vex::motor_group(LFT, LFB), vex::motor_group(RFT, RFB), vex::motor_group(LBT, LBB), vex::motor_group(RBT, RBB), &mcl, imu);
+neblib::PID linearPID(
+    neblib::PID::Gains(
+        0.4,
+        0.005,
+        0.8,
+        0.45),
+    neblib::PID::Behaviors(
+        12.0,
+        true),
+    neblib::PID::ExitConditions(
+        0.25,
+        30));
 
+neblib::PID angularPID(
+    neblib::PID::Gains(
+        0.15,
+        0.005,
+        0.2),
+    neblib::PID::Behaviors(
+        15.0,
+        true),
+    neblib::PID::ExitConditions(
+        0.5,
+        50));
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -64,16 +96,17 @@ neblib::XDrive xDrive(vex::motor_group(LFT, LFB), vex::motor_group(RFT, RFB), ve
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-void pre_auton(void) {
-
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+void pre_auton(void)
+{
+    xDrive.setLinearController(&linearPID);
+    xDrive.setAngularController(&angularPID);
 }
 
-void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+void autonomous(void)
+{
+    // ..........................................................................
+    // Insert autonomous user code here.
+    // ..........................................................................
 }
 
 /*---------------------------------------------------------------------------*/
@@ -86,55 +119,59 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+void usercontrol(void)
+{
+    odom.calibrate();
+    odom.setPose(
+        0.0,
+        0.0,
+        90.0);
+    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
+    int out = xDrive.driveToPose(23.5, 0.0, 90.0, 2500);
+    controller1.Screen.print(out);
+    xDrive.turnTo(90.0);
 
-void usercontrol(void) {
+    task::sleep(1000);
+    xDrive.stop(coast);
 
-  imu.calibrate();
-  task::sleep(2000);
+    while (true)
+    {
+        // xDrive.driveGlobal(
+        //     controller1.Axis3.position(percent),
+        //     controller1.Axis4.position(percent),
+        //     controller1.Axis1.position(percent),
+        //     vex::velocityUnits::pct);
 
-  mcl.setPose(-48.0, -24.0, 270);
-  int time = Brain.Timer.time();
- 
-  while (true)
-  {
-    mcl.update();
-    neblib::Pose e = mcl.getPose();
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("x: ");
-    Brain.Screen.print(e.x);
-
-    Brain.Screen.setCursor(2, 1);
-    Brain.Screen.print("y: ");
-    Brain.Screen.print(e.y);
-
-    Brain.Screen.setCursor(3, 1);
-    Brain.Screen.print("h: ");
-    Brain.Screen.print(e.heading);
-
-    Brain.Screen.setCursor(4, 1);
-    Brain.Screen.print("t: ");
-    Brain.Screen.print(Brain.Timer.time() - time);
-    time = Brain.Timer.time();
-    
-    task::sleep(10);
-  }
+        const neblib::Pose p = odom.getPose();
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1, 1);
+        Brain.Screen.print("X: ");
+        Brain.Screen.print(p.x);
+        Brain.Screen.setCursor(2, 1);
+        Brain.Screen.print("Y: ");
+        Brain.Screen.print(p.y);
+        Brain.Screen.setCursor(3, 1);
+        Brain.Screen.print("T: ");
+        Brain.Screen.print(p.heading);
+        task::sleep(10);
+    }
 }
 
 //
 // Main will set up the competition functions and callbacks.
 //
-int main() {
-  // Set up callbacks for autonomous and driver control periods.
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+int main()
+{
+    // Set up callbacks for autonomous and driver control periods.
+    Competition.autonomous(autonomous);
+    Competition.drivercontrol(usercontrol);
 
-  // Run the pre-autonomous function.
-  pre_auton();
+    // Run the pre-autonomous function.
+    pre_auton();
 
-  // Prevent main from exiting with an infinite loop.
-  while (true) {
-    wait(100, msec);
-  }
+    // Prevent main from exiting with an infinite loop.
+    while (true)
+    {
+        wait(100, msec);
+    }
 }
-
