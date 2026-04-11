@@ -397,7 +397,7 @@ void leftMid(vex::color c)
     task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
 
     // ----- Match load ----- //
-    xDrive.driveTo(-56.2, 46, 1000); // 1500
+    xDrive.driveTo(-56.2, 45.5, 1000); // 1500
     intake.setSpeed(100);
     liftCylinder.toggle();
     matchloadCylinder.toggle();
@@ -405,7 +405,7 @@ void leftMid(vex::color c)
     task::sleep(1500); // 2000
 
     // ----- Score long goal ----- //
-    xDrive.driveTo(-36, 46.25, 1000); // 1500
+    xDrive.driveTo(-36, 45.5, 1000); // 1500
     auto curPose = odom.getPose();
     xDrive.turnFor(90 - imu.heading(deg));
     // odom.setPose(
@@ -419,7 +419,7 @@ void leftMid(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, 47.5, 750); // 1000
+    xDrive.driveTo(-29, 46.5, 750); // 1000
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -469,7 +469,7 @@ void leftMid(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-12.5, 13.5, 135, 1750, -6, 6);
+    xDrive.driveToPose(-13.5, 12.5, 135, 1750, -6, 6);
     vex::task([]()
               {
         printTime();
