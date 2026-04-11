@@ -22,35 +22,39 @@ competition Competition;
 brain Brain;
 controller controller1(primary);
 
-vex::motor leverMotor(PORT6, ratio36_1, true);
-vex::motor intakeMotor(PORT13, ratio6_1, true);
+vex::motor leverMotor(PORT5, ratio36_1, true);
+vex::motor intakeMotor(PORT11, ratio6_1, true);
 
-vex::motor left1(PORT16, ratio6_1, false);
-vex::motor left2(PORT17, ratio6_1, true);
-vex::motor left3(PORT18, ratio6_1, true);
-vex::motor left4(PORT19, ratio6_1, false);
-vex::motor left5(PORT20, ratio6_1, true);
+vex::motor left1(PORT14, ratio6_1, false);
+vex::motor left2(PORT15, ratio6_1, true);
+vex::motor left3(PORT16, ratio6_1, true);
+vex::motor left4(PORT17, ratio6_1, false);
+vex::motor left5(PORT18, ratio6_1, true);
 vex::motor_group leftMotors(left1, left2, left3, left4, left5);
 
-vex::motor right1(PORT1, ratio6_1, true);
-vex::motor right2(PORT2, ratio6_1, false);
-vex::motor right3(PORT3, ratio6_1, false);
-vex::motor right4(PORT4, ratio6_1, true);
-vex::motor right5(PORT5, ratio6_1, false);
+vex::motor right1(PORT6, ratio6_1, true);
+vex::motor right2(PORT7, ratio6_1, false);
+vex::motor right3(PORT8, ratio6_1, false);
+vex::motor right4(PORT21, ratio6_1, true);
+vex::motor right5(PORT10, ratio6_1, false);
 vex::motor_group rightMotors(right1, right2, right3, right4, right5);
 
-vex::rotation parallelRotation(PORT11);
+vex::rotation parallelRotation(PORT13);
 neblib::RotationTrackerWheel parallelTrackerWheel(parallelRotation, 2.0);
 
 vex::inertial imu(PORT12);
 
 neblib::StandardDrive standardDrive(leftMotors, rightMotors, nullptr, parallelTrackerWheel, imu);
 
-vex::led wing(Brain.ThreeWirePort.F);
-vex::led matchload(Brain.ThreeWirePort.G);
-vex::led lift(Brain.ThreeWirePort.H);
+vex::led wing(Brain.ThreeWirePort.A);
+vex::led wingExtend(Brain.ThreeWirePort.B);
+
+vex::led matchload(Brain.ThreeWirePort.H);
+vex::led lift(Brain.ThreeWirePort.G);
 
 neblib::Cylinder wingCylinder(wing);
+neblib::Cylinder wingExtendCylinder(wingExtend);
+
 neblib::Cylinder matchloadCylinder(matchload);
 neblib::Cylinder liftCylinder(lift);
 
@@ -128,7 +132,7 @@ void rightAWP()
     standardDrive.driveFor(-26.25, 2);
     standardDrive.turnTo(45, 1.5);
     liftCylinder.toggle();
-    standardDrive.driveFor(18.5, 2);
+    standardDrive.driveFor(16, 2);
     intakeMotor.spin(reverse, 100, percent);
     task::sleep(1333);
 
@@ -138,12 +142,12 @@ void rightAWP()
         matchloadCylinder.toggle();
         return 0;
     });
-    standardDrive.driveFor(-47, 2);
+    standardDrive.driveFor(-42, 2);
     standardDrive.turnTo(270, 2);
     intakeMotor.spin(forward, 100, percent);
     int totalTime = 1500;
-    double t = standardDrive.driveFor(9, 3, 6, 0.001 * totalTime);
-    task::sleep(totalTime - int(1000.0 * t));
+    double t = standardDrive.driveFor(12, 3, 6, 0.001 * totalTime);
+    task::sleep(totalTime - int(300.0 * t));
 
     // Score Long goal
     standardDrive.driveFor(-26, 272, 1.5);
@@ -274,12 +278,16 @@ double standardizeExp(double input, double exp)
 void usercontrol(void)
 {
     neblib::launchTask(std::bind(&Lever::startLoop, &lever));
+    wingCylinder.toggle();
+
+
 
     bool rightWasPressing = false;
     bool bWasPressing = false;
     bool r2WasPressing = false;
     while (true)
     {
+
         if (controller1.ButtonR1.pressing())
             lever.setVelocity(100);
         else
@@ -293,7 +301,7 @@ void usercontrol(void)
             intakeMotor.stop(brake);
 
         if (controller1.ButtonRight.pressing() && !rightWasPressing)
-            wingCylinder.toggle();
+            wingExtendCylinder.toggle();
         if (controller1.ButtonY.pressing() && !bWasPressing)
             matchloadCylinder.toggle();
         if (controller1.ButtonR2.pressing() && !r2WasPressing)
