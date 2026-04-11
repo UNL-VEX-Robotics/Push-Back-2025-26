@@ -1,0 +1,62 @@
+#include "intake.hpp"
+
+Intake::Intake(
+    vex::motor_group &&frontMotors, 
+    vex::motor_group &&mainMotors, 
+    vex::motor &topMotor, 
+    vex::motor &middleMotor, 
+    vex::optical &colorSensor,
+    neblib::Cylinder &hood)
+    : topMotor(topMotor), 
+      middleMotor(middleMotor), 
+      frontMotors(frontMotors), 
+      mainMotors(mainMotors), 
+      colorSensor(colorSensor), 
+      hood(hood),
+      velocity(0.0), 
+      running(false), 
+      frontRunning(true) {}
+
+void Intake::startLoop()
+{
+    running = true;
+    int msStopped = 0;
+    while (running)
+    {
+        if (frontRunning)
+            frontMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+        else 
+            frontMotors.stop(vex::brakeType::coast);
+        mainMotors.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+
+        // middle motor only if reversed or scoring through top or if velocity can keep up
+        if (velocity <= 0 || hood.getState())
+        {
+            middleMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+            topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+            msStopped = 0;
+        }
+        else if (msStopped < 250)
+        {
+            middleMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+            if (velocity > 0) topMotor.spin(vex::directionType::fwd, 0.2 * velocity, vex::velocityUnits::pct);
+            else topMotor.spin(vex::directionType::fwd, velocity, vex::velocityUnits::pct);
+
+            if (middleMotor.velocity(vex::velocityUnits::pct) < 0.25 * velocity) msStopped += 5;
+            else msStopped = 0;
+        }
+        else 
+        {
+            middleMotor.stop(vex::brakeType::coast);
+            topMotor.stop(vex::brakeType::coast);
+        }
+
+        vex::task::sleep(5);
+    }
+}
+
+void Intake::stopLoop() { running = false; }
+
+void Intake::setSpeed(double velocity) { this->velocity = velocity; }
+
+void Intake::toggleFront(bool toggle) { this->frontRunning = toggle; }

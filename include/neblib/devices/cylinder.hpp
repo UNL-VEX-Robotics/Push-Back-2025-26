@@ -8,14 +8,14 @@ namespace neblib
     class Cylinder
     {
     private:
-        vex::led cylinder;
+        vex::led &cylinder;
         bool state;
 
     public:
         /// @brief Constructs a new Cylinder object.
         ///
         /// @param port threewire port
-        Cylinder(vex::triport::port port);
+        Cylinder(vex::led &cylinder);
 
         /// @brief Sets the cylinder to a desired state
         ///

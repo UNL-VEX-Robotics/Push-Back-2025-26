@@ -1,7 +1,7 @@
 #include "neblib/devices/cylinder.hpp"
 
-neblib::Cylinder::Cylinder(vex::triport::port port)
-    : cylinder(port),
+neblib::Cylinder::Cylinder(vex::led &cylinder)
+    : cylinder(cylinder),
       state(false)
 {
 }
