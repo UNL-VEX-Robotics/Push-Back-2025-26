@@ -142,7 +142,7 @@ void rightAWP()
         matchloadCylinder.toggle();
         return 0;
     });
-    standardDrive.driveFor(-42, 2);
+    standardDrive.driveFor(-44, 2);
     standardDrive.turnTo(270, 2);
     intakeMotor.spin(forward, 100, percent);
     int totalTime = 1500;
@@ -150,7 +150,7 @@ void rightAWP()
     task::sleep(totalTime - int(300.0 * t));
 
     // Score Long goal
-    standardDrive.driveFor(-26, 272, 1.5);
+    standardDrive.driveFor(-29.5, 272, 1.5);
     lever.setVelocity(70);
     task::sleep(250);
     intakeMotor.spin(reverse, 100, percent);
