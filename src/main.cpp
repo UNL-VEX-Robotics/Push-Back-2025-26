@@ -141,7 +141,7 @@ neblib::Page redPage = neblib::Page(
          vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Left Red Mid"),
+         "Red < Mid"),
      neblib::Button(
          10,
          60,
@@ -151,7 +151,7 @@ neblib::Page redPage = neblib::Page(
          vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Left Red AWP"),
+         "Red < AWP"),
      neblib::Button(
          10,
          180,
@@ -161,7 +161,7 @@ neblib::Page redPage = neblib::Page(
          vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Left Red End")});
+         "Red < End")});
 
 neblib::Page bluePage = neblib::Page(
     neblib::Button(
@@ -183,7 +183,7 @@ neblib::Page bluePage = neblib::Page(
          vex::color(0, 0, 150),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Left Blue Mid"),
+         "Blue < Mid"),
      neblib::Button(
          10,
          60,
@@ -193,7 +193,7 @@ neblib::Page bluePage = neblib::Page(
          vex::color(0, 0, 150),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Left Blue AWP"),
+         "Blue < AWP"),
      neblib::Button(
          10,
          180,
@@ -203,7 +203,57 @@ neblib::Page bluePage = neblib::Page(
          vex::color(0, 0, 150),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Left Blue End")});
+         "Blue < End"),
+     neblib::Button(
+         310,
+         60,
+         160,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Blue > AWP"),
+     neblib::Button(
+         310,
+         120,
+         160,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Blue > Mid"),
+     neblib::Button(
+         310,
+         180,
+         160,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Blue > End"),
+     neblib::Button(
+         180,
+         60,
+         120,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Blue > Far"),
+     neblib::Button(
+         180,
+         180,
+         120,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Blue >^ Wing")});
 
 neblib::Page skillsPage = neblib::Page(
     neblib::Button(
@@ -225,7 +275,7 @@ neblib::Page skillsPage = neblib::Page(
         vex::color(150, 0, 0),
         vex::color(255, 255, 255),
         vex::color(255, 255, 255),
-        "Left Skills")});
+        "< Skills")});
 
 neblib::AutonSelector autonSelector(
     Brain,
@@ -575,6 +625,353 @@ void leftEnd(vex::color c)
     xDrive.turnTo(270, 1000);
     matchloadCylinder.toggle();
     xDrive.driveTo(0, 40, 2000, -5, 5);
+    
+}
+
+void rightAWP(vex::color c)
+{
+    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
+
+    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
+    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
+
+    // ----- Match Load ----- //
+    xDrive.driveTo(-58, -46, 1000);
+    intake.setSpeed(100);
+    liftCylinder.toggle();
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(1500); 
+
+    // ----- Score Long Goal ----- //
+    xDrive.driveTo(-40, -46.25, 1000);
+    xDrive.turnFor(90 - imu.heading(deg));
+    intake.setSpeed(-100);
+    task::sleep(100);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    matchloadCylinder.toggle();
+
+    xDrive.driveTo(-29, -47.5, 750);
+    intake.setSpeed(100);
+    setScore();
+    senseColor(oppositeColor, 2000);
+    intake.setSpeed(0);
+
+    // ----- Match Load 2 ----- //
+    vex::task([]()
+              {
+        task::sleep(100);
+        intake.setSpeed(80);
+        return 0; });
+    int t = xDrive.driveTo(-42, -47, 1000);
+    task::sleep(800 - t);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.turnTo(270, 1000);
+
+    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
+    intake.setSpeed(100);
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(2000);
+
+    // ----- Score Center ----- //
+    xDrive.driveTo(-42, -46.5, 1000);
+    liftCylinder.toggle();
+    intake.setSpeed(0);
+    matchloadCylinder.toggle();
+    xDrive.turnTo(135);
+    xDrive.driveTo(-20, 20, 3000); // 3000
+    vex::task([]()
+              {
+        intake.setSpeed(-100);
+        task::sleep(100);
+        intake.setSpeed(0);
+        task::sleep(300);
+        hoodCylinder.toggle();
+        return 0; });
+    xDrive.driveToPose(-9, 9, 135, 1250, -6, 6);
+    intake.setSpeed(50);
+    setScore();
+    senseColor(oppositeColor, 3000);
+    xDrive.driveLocal(-8, 0, 0, volt);
+    task::sleep(250);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.driveToPose(-9, 9, 135, 1500);
+    task::sleep(100);
+}
+
+void rightMid(vex::color c)
+{
+    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
+
+    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
+    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
+
+    // ----- Match Load ----- //
+    xDrive.driveTo(-58, -46, 1000);
+    intake.setSpeed(100);
+    liftCylinder.toggle();
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(1500); 
+
+    // ----- Score Long Goal ----- //
+    xDrive.driveTo(-40, -46.25, 1000);
+    xDrive.turnFor(90 - imu.heading(deg));
+    intake.setSpeed(-100);
+    task::sleep(100);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    matchloadCylinder.toggle();
+
+    xDrive.driveTo(-29, -47.5, 750);
+    intake.setSpeed(100);
+    setScore();
+    senseColor(oppositeColor, 2000);
+    intake.setSpeed(0);
+
+    // ----- Match Load 2 ----- //
+    vex::task([]()
+              {
+        task::sleep(100);
+        intake.setSpeed(80);
+        return 0; });
+    int t = xDrive.driveTo(-42, -47, 1000);
+    task::sleep(800 - t);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.turnTo(270, 1000);
+
+    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
+    intake.setSpeed(100);
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(2000);
+
+    // ----- Wing Long Goal ----- //
+    xDrive.driveTo(-35, -34.5, 1500);
+    matchloadCylinder.toggle();
+    xDrive.turnFor(90 - imu.heading(deg));
+    xDrive.driveTo(-8, -38, 2000, -6, 6);
+    wingCylinder.toggle();
+
+    // ----- Score Center ----- //
+    xDrive.driveTo(-30, 0, 1000);
+    liftCylinder.toggle();
+    intake.setSpeed(0);
+    xDrive.turnTo(135);
+    xDrive.driveTo(-20, 20, 1750); // 3000
+    vex::task([]()
+              {
+        intake.setSpeed(-100);
+        task::sleep(100);
+        intake.setSpeed(0);
+        task::sleep(300);
+        hoodCylinder.toggle();
+        return 0; });
+    xDrive.driveToPose(-8.5, 9, 135, 1250, -6, 6);
+    intake.setSpeed(50);
+    setScore();
+    senseColor(oppositeColor, 3000);
+    xDrive.driveLocal(-8, 0, 0, volt);
+    task::sleep(250);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.driveToPose(-8.5, 9, 135, 1500);
+    task::sleep(100);
+}
+
+void rightEnd(vex::color c)
+{
+    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
+
+    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
+    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
+
+    // ----- Match Load ----- //
+    xDrive.driveTo(-58, -46, 1000);
+    intake.setSpeed(100);
+    liftCylinder.toggle();
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(1500); 
+
+    // ----- Score Long Goal ----- //
+    xDrive.driveTo(-40, -46.25, 1000);
+    xDrive.turnFor(90 - imu.heading(deg));
+    intake.setSpeed(-100);
+    task::sleep(100);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    matchloadCylinder.toggle();
+
+    xDrive.driveTo(-29, -47.5, 750);
+    intake.setSpeed(100);
+    setScore();
+    senseColor(oppositeColor, 2000);
+    intake.setSpeed(0);
+
+    // ----- Match Load 2 ----- //
+    vex::task([]()
+              {
+        task::sleep(100);
+        intake.setSpeed(80);
+        return 0; });
+    int t = xDrive.driveTo(-42, -47, 1000);
+    task::sleep(800 - t);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.turnTo(270, 1000);
+
+    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
+    intake.setSpeed(100);
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(2000);
+
+    // ----- Score Center ----- //
+    xDrive.driveTo(-42, -46.5, 1000);
+    liftCylinder.toggle();
+    intake.setSpeed(0);
+    matchloadCylinder.toggle();
+    xDrive.turnTo(135);
+    xDrive.driveTo(-20, 20, 3000); // 3000
+    vex::task([]()
+              {
+        intake.setSpeed(-100);
+        task::sleep(100);
+        intake.setSpeed(0);
+        task::sleep(300);
+        hoodCylinder.toggle();
+        return 0; });
+    xDrive.driveToPose(-8.5, 9, 135, 1250, -6, 6);
+    intake.setSpeed(50);
+    setScore();
+    senseColor(oppositeColor, 3000);
+    xDrive.driveLocal(-8, 0, 0, volt);
+    task::sleep(250);
+    intake.setSpeed(0);
+    
+    // ----- Wing ----- //
+    xDrive.driveTo(-30, 0, 1000);
+    hoodCylinder.toggle();
+    liftCylinder.toggle();
+    xDrive.turnTo(90);
+
+    xDrive.driveTo(-35, -34.25, 1500);
+    xDrive.driveTo(-8, -38, 2000, -6, 6);
+}
+
+void rightFar(vex::color c)
+{
+    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
+
+    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
+    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
+
+    // ----- Match Load ----- //
+    xDrive.driveTo(-58, -46, 1000);
+    intake.setSpeed(100);
+    liftCylinder.toggle();
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(1500); 
+
+    // ----- Score Long Goal ----- //
+    xDrive.driveTo(-40, -46.25, 1000);
+    xDrive.turnFor(90 - imu.heading(deg));
+    intake.setSpeed(-100);
+    task::sleep(100);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    matchloadCylinder.toggle();
+
+    xDrive.driveTo(-29, -47.5, 750);
+    intake.setSpeed(100);
+    setScore();
+    senseColor(oppositeColor, 2000);
+    intake.setSpeed(0);
+
+    // ----- Match Load 2 ----- //
+    vex::task([]()
+              {
+        task::sleep(100);
+        intake.setSpeed(80);
+        return 0; });
+    int t = xDrive.driveTo(-42, -47, 1000);
+    task::sleep(800 - t);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.turnTo(270, 1000);
+
+    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
+    intake.setSpeed(100);
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(2000);
+
+    // ----- Score Center ----- //
+}
+
+void rightFarWing(vex::color c)
+{
+    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
+
+    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
+    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
+
+    // ----- Match Load ----- //
+    xDrive.driveTo(-58, -46, 1000);
+    intake.setSpeed(100);
+    liftCylinder.toggle();
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(1500); 
+
+    // ----- Score Long Goal ----- //
+    xDrive.driveTo(-40, -46.25, 1000);
+    xDrive.turnFor(90 - imu.heading(deg));
+    intake.setSpeed(-100);
+    task::sleep(100);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    matchloadCylinder.toggle();
+
+    xDrive.driveTo(-29, -47.5, 750);
+    intake.setSpeed(100);
+    setScore();
+    senseColor(oppositeColor, 2000);
+    intake.setSpeed(0);
+
+    // ----- Match Load 2 ----- //
+    vex::task([]()
+              {
+        task::sleep(100);
+        intake.setSpeed(80);
+        return 0; });
+    int t = xDrive.driveTo(-42, -47, 1000);
+    task::sleep(800 - t);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.turnTo(270, 1000);
+
+    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
+    intake.setSpeed(100);
+    matchloadCylinder.toggle();
+    xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(2000);
+
+    // ----- Wing Long Goal ----- //
+    xDrive.driveTo(-35, -34.5, 1500);
+    matchloadCylinder.toggle();
+    xDrive.turnFor(90 - imu.heading(deg));
+    xDrive.driveTo(-8, -38, 2000, -6, 6);
+    wingCylinder.toggle();
+
+    // ----- Score Center ----- //
 }
 
 void autonomous(void)
@@ -582,12 +979,22 @@ void autonomous(void)
     startTime = Brain.Timer.system();
     vex::task i = neblib::launchTask(std::bind(&Intake::startLoop, &intake));
     auto route = autonSelector.getAuton();
-    if (neblib::contains(route, "AWP"))
+    if (neblib::contains(route, "< AWP"))
         leftAWP(autonSelector.getColor());
-    else if (neblib::contains(route, "Mid"))
+    else if (neblib::contains(route, "< Mid"))
         leftMid(autonSelector.getColor());
-    else if (neblib::contains(route, "End"))
+    else if (neblib::contains(route, "< End"))
         leftEnd(autonSelector.getColor());
+    else if (neblib::contains(route, "> AWP"))
+        rightAWP(autonSelector.getColor());
+    else if (neblib::contains(route, "> Mid"))
+        rightMid(autonSelector.getColor());
+    else if (neblib::contains(route, "> End"))
+        rightEnd(autonSelector.getColor());
+    else if (neblib::contains(route, "> Far"))
+        rightFar(autonSelector.getColor());
+    else if (neblib::contains(route, ">^ Wing"))
+        rightFarWing(autonSelector.getColor());
 
     printTime();
 
