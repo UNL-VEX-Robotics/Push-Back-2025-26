@@ -43,6 +43,7 @@ vex::rotation parallelRotation(PORT13);
 neblib::RotationTrackerWheel parallelTrackerWheel(parallelRotation, 2.0);
 
 vex::inertial imu(PORT12);
+vex::distance dist(PORT1);
 
 neblib::StandardDrive standardDrive(leftMotors, rightMotors, nullptr, parallelTrackerWheel, imu);
 
@@ -61,10 +62,7 @@ neblib::Cylinder liftCylinder(lift);
 Lever lever(leverMotor);
 
 neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Red"), {
-    neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red AWP"),
-    neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Elims"),
-    neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Many"),
-    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Red Safe")});
+    neblib::Button(310, 60, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red > AWP")});
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
     neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue AWP"),
     neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue Elims"),
@@ -75,7 +73,7 @@ neblib::AutonSelector selector = neblib::AutonSelector(Brain, {&redPage, &bluePa
 neblib::PID turnPID(0.1, 0.01, 0.5, 15.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 30, 10)), true);
 neblib::PID swingPID(0.125, 0.01, 0.25, 15.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 30, 10)), true);
 neblib::PID drivePID(0.5, 0.01, 1.5, 6.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
-neblib::PID angularPID(0.2, 0.0, 0.0, 0.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
+neblib::PID angularPID(0.5, 0.0, 0.0, 0.0, std::make_shared<neblib::PID::SettleTimeExitConditions>(neblib::PID::SettleTimeExitConditions(0.5, 50, 10)), true);
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -99,10 +97,11 @@ void pre_auton(void)
     Brain.Screen.setPenColor(vex::color(255, 255, 255));
     Brain.Screen.setFillColor(vex::color(0, 0, 0));
 
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("Calibrating Inertial...");
+    Brain.Screen.clearScreen(yellow);
 
     waitUntil(!Brain.Screen.pressing());
+    task::sleep(250);
+    Brain.Screen.clearScreen(green);
 
     imu.startCalibration();
     do
@@ -111,120 +110,91 @@ void pre_auton(void)
     } while (imu.isCalibrating());
     imu.setHeading(90, deg);
 
-    while (!Brain.Screen.pressing())
-    {
-        Brain.Screen.clearScreen(selector.getColor());
-        Brain.Screen.setCursor(1, 1);
-        Brain.Screen.print(imu.heading(deg));
-        task::sleep(10);
-    }
+    Brain.Screen.clearScreen(selector.getColor());
+    controller1.rumble(".");
 }
 
 void rightAWP()
 {
-    // Intake under long goal
+    imu.setHeading(180, deg);
+
+    // ----- Match Load ----- //
+    standardDrive.driveFor(dist.objectDistance(inches) - 18.25, 1.5);
+    lever.setVelocity(-100);
+    wingCylinder.set(true);
+    liftCylinder.set(true);
+    matchloadCylinder.toggle();
+    standardDrive.turnTo(270, 1.5);
     intakeMotor.spin(forward, 100, percent);
-    standardDrive.driveFor(47, 2);
-    standardDrive.driveFor(6, -3, 3, 2.5);
-    task::sleep(250);
+    int totalMatchLoadTime = int(1000 * standardDrive.driveFor(10, 1.5));
+    task::sleep(1800 - totalMatchLoadTime);
+    controller1.Screen.print("%.2f, ", dist.objectDistance(inches));
 
-    // Score bottom middle
-    standardDrive.driveFor(-25.25, 2);
-    standardDrive.turnTo(45, 1.5);
-    liftCylinder.toggle();
-    standardDrive.driveFor(16, 2);
+    // ----- Score Long Goal ----- //
+    standardDrive.driveFor(-32, 270, 1.5);
+    lever.setVelocity(100);
+    task::sleep(50);
     intakeMotor.spin(reverse, 100, percent);
-    task::sleep(1333);
-
-    // Matchload
-    vex::task([](){
-        task::sleep(500);
-        matchloadCylinder.toggle();
+    task::sleep(700);
+    lever.setVelocity(-100);
+    vex::task([]() {
+        task::sleep(250);
+        intakeMotor.spin(forward, 100, percent);
         return 0;
     });
-    standardDrive.driveFor(-44.5, 2);
-    standardDrive.turnTo(270, 2);
-    intakeMotor.spin(forward, 100, percent);
-    int totalTime = 1500;
-    double t = standardDrive.driveFor(12, 3, 6, 0.001 * totalTime);
-    task::sleep(totalTime - int(300.0 * t));
 
-    // Score Long goal
-    standardDrive.driveFor(-35, 272, 1.5);
-    lever.setVelocity(70);
-    task::sleep(250);
+    // ----- Match Load ----- //
+    standardDrive.driveFor(30, 270, -5, 5, 1.5);
+    task::sleep(1000);
+    standardDrive.driveFor(-12);
+    standardDrive.turnTo(300, 1);
+    matchloadCylinder.toggle();
+    lever.setVelocity(100);
+    task::sleep(50);
+    intakeMotor.stop(coast);
+    task::sleep(50);
+    lever.setVelocity(50);
+    task::sleep(500);
+    lever.setVelocity(-100);
+    standardDrive.turnTo(270);
+    matchloadCylinder.toggle();
+    task::sleep(100);
+    standardDrive.driveFor(13.5);
+    intakeMotor.spin(forward, 100, percent);
+    task::sleep(3000);
+
+    // ----- Score Middle Goal ----- //
+    standardDrive.driveFor(-4);
+    standardDrive.turnTo(45);
+    matchloadCylinder.toggle();
+    standardDrive.driveFor(44);
     intakeMotor.spin(reverse, 100, percent);
-    task::sleep(1500);
+    task::sleep(3000);
+
+    // // ----- Score Long Goal ----- //
+    // standardDrive.driveFor(-32, 270, 1.5);
+    // lever.setVelocity(100);
+    // task::sleep(750);
+    // lever.setVelocity(-100);
 }
 
 void rightSafe()
 {
-    // Score bottom middle
-    standardDrive.driveFor(26, 2);
-    standardDrive.turnTo(45, 1.5);
-    liftCylinder.toggle();
-    standardDrive.driveFor(18.5, 2);
-    intakeMotor.spin(reverse, 100, percent);
-    task::sleep(500);
-
-    // Matchload
-    vex::task([](){
-        task::sleep(500);
-        matchloadCylinder.toggle();
-        return 0;
-    });
-    standardDrive.driveFor(-47, 2);
-    standardDrive.turnTo(270, 2);
-    intakeMotor.spin(forward, 100, percent);
-    int totalTime = 1285;
-    double t = standardDrive.driveFor(9, 3, 6, 0.001 * totalTime);
-    task::sleep(totalTime - int(1000.0 * t));
-
-    // Score Long goal
-    standardDrive.driveFor(-26, 271, 1.5);
-    lever.setVelocity(80);
-    task::sleep(250);
-    intakeMotor.spin(reverse, 100, percent);
+    
 }
 
 void rightMany()
 {
-    lever.setVelocity(-100);
-    intakeMotor.spin(forward, 100, percent);
-    standardDrive.driveFor(26, 2);
-    task::sleep(1000);
-    standardDrive.swingFor(left, -60, 1.25);
-    lever.setVelocity(100);
-    task::sleep(750);
-    lever.setVelocity(-100);
-    standardDrive.swingFor(left, 60, 2);
-    intakeMotor.spin(forward, 100, percent);
-    task::sleep(2500);
-
-    // Score Long goal
-    standardDrive.driveFor(-26, 272, 1.5);
-    lever.setVelocity(35);
-    task::sleep(250);
-    intakeMotor.spin(reverse, 100, percent);
 }
 
 void rightElims()
 {
-    task::sleep(1000);
-    wingCylinder.toggle();
-    standardDrive.swingFor(right, 180, 2);
-    standardDrive.driveFor(10);
-    standardDrive.swingFor(right, 35, 2);
-    standardDrive.driveFor(8);
-    standardDrive.swingTo(left, 90, 2);
-    wingCylinder.toggle();
-    standardDrive.driveFor(8);
+    
 }
 
 void skills()
 {
-    intakeMotor.spin(forward, 100, percent);
-    wingCylinder.toggle();
+    
 }
 
 void autonomous(void)
@@ -233,9 +203,8 @@ void autonomous(void)
     auto startTime = Brain.Timer.system();
     
     neblib::launchTask(std::bind(&Lever::startLoop, &lever));
-    lever.setVelocity(-100);
 
-    if (neblib::contains(auton, "AWP"))
+    if (neblib::contains(auton, "> AWP"))
         rightAWP();
     else if (neblib::contains(auton, "Safe"))
         rightSafe();
@@ -278,9 +247,7 @@ double standardizeExp(double input, double exp)
 void usercontrol(void)
 {
     neblib::launchTask(std::bind(&Lever::startLoop, &lever));
-    wingCylinder.toggle();
-
-
+    wingCylinder.set(true);
 
     bool rightWasPressing = false;
     bool bWasPressing = false;
