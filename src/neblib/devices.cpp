@@ -48,6 +48,8 @@ neblib::Cylinder::Cylinder(vex::led &cylinder) : cylinder(cylinder), toggled(fal
 
 void neblib::Cylinder::set(bool state) 
 { 
+    if (state == this->toggled)
+        return;
     if (state) cylinder.off();
     else cylinder.on();
     toggled = state;
