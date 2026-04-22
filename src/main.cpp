@@ -914,6 +914,28 @@ void rightFar(vex::color c)
     task::sleep(2000);
 
     // ----- Score Center ----- //
+    vex::task([]()
+              {
+            task::sleep(100);
+            intake.setSpeed(-80);
+            task::sleep(50);
+            intake.setSpeed(0);
+            task::sleep(250);
+            liftCylinder.toggle();
+            matchloadCylinder.toggle();
+            hoodCylinder.toggle();
+            return 0;});
+
+    //xDrive.driveToPose(7, -24, 315, 3000, -7, 7);
+    //xDrive.turnTo(315);
+    xDrive.driveLocal(-3, 6, 0, volt);
+    task::sleep(500);
+    xDrive.driveToPose(7, -24, 315, 3000, -7, 7);
+    xDrive.driveTo(12.25, -13, 2000, -6, 6);
+    intake.setSpeed(50);
+    setScore();
+    senseColor(oppositeColor, 3000);
+    intake.setSpeed(0);
 }
 
 void rightFarWing(vex::color c)
