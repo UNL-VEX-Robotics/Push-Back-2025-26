@@ -1068,10 +1068,7 @@ void usercontrol(void)
             hoodCylinder.toggle();
         if (controller1.ButtonY.pressing() && !yWasPressing)
             matchloadCylinder.toggle();
-        if (controller1.ButtonRight.pressing() && !rightWasPressing)
-        {
-            wingCylinder.toggle();
-        }
+        wingCylinder.setState(!controller1.ButtonRight.pressing());
         if (controller1.ButtonLeft.pressing() || controller1.ButtonDown.pressing())
             intakeVelocity = 0.4 * intakeVelocity;
         intake.setSpeed(intakeVelocity);
