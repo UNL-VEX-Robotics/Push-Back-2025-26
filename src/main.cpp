@@ -138,7 +138,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(150, 0, 0),
+         vex::color(0, 0, 150),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red < Mid"),
@@ -148,7 +148,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(150, 0, 0),
+         vex::color(0, 0, 150),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red < AWP"),
@@ -158,10 +158,60 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(150, 0, 0),
+         vex::color(0, 0, 150),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
-         "Red < End")});
+         "Red < End"),
+     neblib::Button(
+         310,
+         60,
+         160,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Red > AWP"),
+     neblib::Button(
+         310,
+         120,
+         160,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Red > Mid"),
+     neblib::Button(
+         310,
+         180,
+         160,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Red > End"),
+     neblib::Button(
+         180,
+         60,
+         120,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Red > Far"),
+     neblib::Button(
+         180,
+         180,
+         120,
+         50,
+         vex::color(0, 0, 0),
+         vex::color(0, 0, 150),
+         vex::color(255, 255, 255),
+         vex::color(255, 255, 255),
+         "Red >^ Wing")});
 
 neblib::Page bluePage = neblib::Page(
     neblib::Button(
@@ -889,7 +939,7 @@ void rightFar(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, -47.5, 750);
+    xDrive.driveTo(-29, -45.5, 750);
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -930,9 +980,10 @@ void rightFar(vex::color c)
     //xDrive.turnTo(315);
     xDrive.driveLocal(-3, 6, 0, volt);
     task::sleep(500);
-    xDrive.driveToPose(7, -24, 315, 3000, -7, 7);
-    xDrive.driveTo(12.25, -13, 2000, -6, 6);
+    xDrive.driveToPose(15, -24, 315, 3000, -7, 7); //Drive towards mid goals 
+    xDrive.driveTo(12.25, -14.25, 2000, -6, 6); //Scoot over 
     intake.setSpeed(50);
+    task::sleep(100);
     setScore();
     senseColor(oppositeColor, 3000);
     intake.setSpeed(0);
@@ -954,15 +1005,15 @@ void rightFarWing(vex::color c)
     task::sleep(1500); 
 
     // ----- Score Long Goal ----- //
-    xDrive.driveTo(-40, -46.25, 1000);
+    xDrive.driveTo(-40, -46.25, 1000); 
     xDrive.turnFor(90 - imu.heading(deg));
     intake.setSpeed(-100);
     task::sleep(100);
     intake.setSpeed(0);
+    matchloadCylinder.toggle(); //Last Changed, swapped with hood
     hoodCylinder.toggle();
-    matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, -47.5, 750);
+    xDrive.driveTo(-29, -47, 750); //Changed, works?
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -974,7 +1025,7 @@ void rightFarWing(vex::color c)
         task::sleep(100);
         intake.setSpeed(80);
         return 0; });
-    int t = xDrive.driveTo(-42, -47, 1000);
+    int t = xDrive.driveTo(-42, -45, 1000); 
     task::sleep(800 - t);
     intake.setSpeed(0);
     hoodCylinder.toggle();
@@ -992,8 +1043,41 @@ void rightFarWing(vex::color c)
     xDrive.turnFor(90 - imu.heading(deg));
     xDrive.driveTo(-8, -38, 2000, -6, 6);
     wingCylinder.toggle();
+    //task::sleep(2000); //Paused for testing when first implimented
 
     // ----- Score Center ----- //
+    vex::task([]()
+              {
+            task::sleep(100);
+            intake.setSpeed(-80);
+            task::sleep(50);
+            intake.setSpeed(0);
+            task::sleep(250);
+            liftCylinder.toggle();
+            matchloadCylinder.toggle();
+            hoodCylinder.toggle();
+            return 0;});
+
+    task::sleep(500);
+    xDrive.driveToPose(15, -24, 315, 3000, -7, 7); //Drive towards mid goals //(10,-24)
+
+    //For some reason this works if there is a robot sitting there and works if there is no bot
+    //Attempts to body slam the robot that is there (I don't think it actually listens but it works...) 
+    //Also for some reason the sleeps were needed
+    task::sleep(100); 
+    xDrive.driveTo(13, -14.25, 10000, -6, 6); //Scoot over, was 2000   //DELETE IF DONT USE
+    task::sleep(100);
+    xDrive.driveTo(10, -10, 1000, -6, 6); //tries to body slam          /DELETE IF DONT USE
+    task::sleep(100);
+
+    //Actually aligns with the goal and scores
+    xDrive.driveTo(12.25, -14.25, 10000, -6, 6); //Scoot over, was 2000 
+    intake.setSpeed(50);
+    task::sleep(100);
+    setScore();
+    senseColor(oppositeColor, 3000);
+    intake.setSpeed(0);
+    //task::sleep(100); 
 }
 
 void autonomous(void)
