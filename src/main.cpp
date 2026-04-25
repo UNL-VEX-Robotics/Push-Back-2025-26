@@ -138,7 +138,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red < Mid"),
@@ -148,7 +148,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red < AWP"),
@@ -158,7 +158,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red < End"),
@@ -168,7 +168,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red > AWP"),
@@ -178,7 +178,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red > Mid"),
@@ -188,7 +188,7 @@ neblib::Page redPage = neblib::Page(
          160,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red > End"),
@@ -198,7 +198,7 @@ neblib::Page redPage = neblib::Page(
          120,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red > Far"),
@@ -208,7 +208,7 @@ neblib::Page redPage = neblib::Page(
          120,
          50,
          vex::color(0, 0, 0),
-         vex::color(0, 0, 150),
+         vex::color(150, 0, 0),
          vex::color(255, 255, 255),
          vex::color(255, 255, 255),
          "Red >^ Wing")});
@@ -702,7 +702,7 @@ void rightAWP(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, -47.5, 750);
+    xDrive.driveTo(-29, -47, 750);
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -727,12 +727,12 @@ void rightAWP(vex::color c)
     task::sleep(2000);
 
     // ----- Score Center ----- //
-    xDrive.driveTo(-42, -46.5, 1000);
+    xDrive.driveTo(-37, -41.5, 1000);
     liftCylinder.toggle();
     intake.setSpeed(0);
     matchloadCylinder.toggle();
     xDrive.turnTo(135);
-    xDrive.driveTo(-20, 20, 3000); // 3000
+    xDrive.driveTo(-18, 18, 3000); // 3000
     vex::task([]()
               {
         intake.setSpeed(-100);
@@ -744,7 +744,7 @@ void rightAWP(vex::color c)
     xDrive.driveToPose(-9, 9, 135, 1250, -6, 6);
     intake.setSpeed(50);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
     xDrive.driveLocal(-8, 0, 0, volt);
     task::sleep(250);
     intake.setSpeed(0);
@@ -777,7 +777,7 @@ void rightMid(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, -47.5, 750);
+    xDrive.driveTo(-29, -47, 750);
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -825,7 +825,7 @@ void rightMid(vex::color c)
     xDrive.driveToPose(-8.5, 9, 135, 1250, -6, 6);
     intake.setSpeed(50);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
     xDrive.driveLocal(-8, 0, 0, volt);
     task::sleep(250);
     intake.setSpeed(0);
