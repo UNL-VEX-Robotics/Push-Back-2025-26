@@ -434,7 +434,7 @@ void leftAWP(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, 47.5, 750); // 1000
+    xDrive.driveTo(-28, 47.5, 750); // 1000
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -480,10 +480,12 @@ void leftAWP(vex::color c)
     xDrive.driveToPose(-12.5, 13.5, 135, 3000, -6, 6);
     intake.setSpeed(50);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
+    intake.setSpeed(0);
+    xDrive.driveLocal(8, 0, 0, volt);
+    task::sleep(50);
     xDrive.driveLocal(-8, 0, 0, volt);
     task::sleep(150);
-    intake.setSpeed(0);
     hoodCylinder.toggle();
     xDrive.driveToPose(-12.5, 13.5, 135, 2000);
     task::sleep(100);
@@ -519,7 +521,7 @@ void leftMid(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, 46.5, 750); // 1000
+    xDrive.driveTo(-28, 46.5, 750); // 1000
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -559,7 +561,6 @@ void leftMid(vex::color c)
     // ----- Score Center ----- //
     liftCylinder.toggle();
     intake.setSpeed(0);
-    matchloadCylinder.toggle();
     xDrive.turnTo(135);
     vex::task([]()
               {
@@ -569,17 +570,15 @@ void leftMid(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-13.5, 12.5, 135, 1750, -6, 6);
-    vex::task([]()
-              {
-        printTime();
-        return 0; });
+    xDrive.driveToPose(-12.5, 13.5, 135, 3000, -6, 6);
     intake.setSpeed(50);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
+    intake.setSpeed(0);
+    xDrive.driveLocal(8, 0, 0, volt);
+    task::sleep(50);
     xDrive.driveLocal(-8, 0, 0, volt);
     task::sleep(150);
-    intake.setSpeed(0);
     hoodCylinder.toggle();
     xDrive.driveToPose(-12.5, 13.5, 135, 2000);
     task::sleep(100);
@@ -615,7 +614,7 @@ void leftEnd(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, 47.5, 750); // 1000
+    xDrive.driveTo(-28, 47.5, 750); // 1000
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -659,23 +658,19 @@ void leftEnd(vex::color c)
         hoodCylinder.toggle();
         return 0; });
     xDrive.driveToPose(-12.5, 13.5, 135, 3000, -6, 6);
-    vex::task([]()
-              {
-        printTime();
-        return 0; });
     intake.setSpeed(50);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
     intake.setSpeed(0);
+    xDrive.driveLocal(8, 0, 0, volt);
+    task::sleep(50);
 
     // ----- Wing ----- //
     xDrive.driveTo(-32, 37.5, 1500);
     hoodCylinder.toggle();
     liftCylinder.toggle();
     xDrive.turnTo(270, 1000);
-    matchloadCylinder.toggle();
     xDrive.driveTo(0, 40, 2000, -5, 5);
-    
 }
 
 void rightAWP(vex::color c)
@@ -691,7 +686,7 @@ void rightAWP(vex::color c)
     liftCylinder.toggle();
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); 
+    task::sleep(1500);
 
     // ----- Score Long Goal ----- //
     xDrive.driveTo(-40, -46.25, 1000);
@@ -766,7 +761,7 @@ void rightMid(vex::color c)
     liftCylinder.toggle();
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); 
+    task::sleep(1500);
 
     // ----- Score Long Goal ----- //
     xDrive.driveTo(-40, -46.25, 1000);
@@ -847,7 +842,7 @@ void rightEnd(vex::color c)
     liftCylinder.toggle();
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); 
+    task::sleep(1500);
 
     // ----- Score Long Goal ----- //
     xDrive.driveTo(-40, -46.25, 1000);
@@ -858,7 +853,7 @@ void rightEnd(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, -47.5, 750);
+    xDrive.driveTo(-29, -47, 750);
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -879,7 +874,7 @@ void rightEnd(vex::color c)
     xDrive.driveToPose(-56.25, -46.5, 270, 1250);
     intake.setSpeed(100);
     matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
+    xDrive.driveLocal(1.75, 0.0, 0.0);
     task::sleep(2000);
 
     // ----- Score Center ----- //
@@ -887,8 +882,8 @@ void rightEnd(vex::color c)
     liftCylinder.toggle();
     intake.setSpeed(0);
     matchloadCylinder.toggle();
-    xDrive.turnTo(135);
-    xDrive.driveTo(-20, 20, 3000); // 3000
+    xDrive.turnTo(135, 1000);
+    xDrive.driveToPose(-18, 18, 135, 2500); // 3000
     vex::task([]()
               {
         intake.setSpeed(-100);
@@ -900,18 +895,18 @@ void rightEnd(vex::color c)
     xDrive.driveToPose(-8.5, 9, 135, 1250, -6, 6);
     intake.setSpeed(50);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
     xDrive.driveLocal(-8, 0, 0, volt);
     task::sleep(250);
     intake.setSpeed(0);
-    
+
     // ----- Wing ----- //
     xDrive.driveTo(-30, 0, 1000);
     hoodCylinder.toggle();
     liftCylinder.toggle();
-    xDrive.turnTo(90);
+    xDrive.turnTo(90, 1000);
 
-    xDrive.driveTo(-35, -34.25, 1500);
+    xDrive.driveToPose(-35, -34.25, 90, 1250);
     xDrive.driveTo(-8, -38, 2000, -6, 6);
 }
 
@@ -928,7 +923,7 @@ void rightFar(vex::color c)
     liftCylinder.toggle();
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); 
+    task::sleep(1500);
 
     // ----- Score Long Goal ----- //
     xDrive.driveTo(-40, -46.25, 1000);
@@ -939,7 +934,7 @@ void rightFar(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-29, -45.5, 750);
+    xDrive.driveTo(-29, -47, 750);
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -974,14 +969,14 @@ void rightFar(vex::color c)
             liftCylinder.toggle();
             matchloadCylinder.toggle();
             hoodCylinder.toggle();
-            return 0;});
+            return 0; });
 
-    //xDrive.driveToPose(7, -24, 315, 3000, -7, 7);
-    //xDrive.turnTo(315);
+    // xDrive.driveToPose(7, -24, 315, 3000, -7, 7);
+    // xDrive.turnTo(315);
     xDrive.driveLocal(-3, 6, 0, volt);
     task::sleep(500);
-    xDrive.driveToPose(15, -24, 315, 3000, -7, 7); //Drive towards mid goals 
-    xDrive.driveTo(12.25, -14.25, 2000, -6, 6); //Scoot over 
+    xDrive.driveToPose(15, -24, 315, 3000, -7, 7); // Drive towards mid goals
+    xDrive.driveTo(12.25, -14.25, 2000, -6, 6);    // Scoot over
     intake.setSpeed(50);
     task::sleep(100);
     setScore();
@@ -1002,18 +997,18 @@ void rightFarWing(vex::color c)
     liftCylinder.toggle();
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); 
+    task::sleep(1500);
 
     // ----- Score Long Goal ----- //
-    xDrive.driveTo(-40, -46.25, 1000); 
+    xDrive.driveTo(-40, -46.25, 1000);
     xDrive.turnFor(90 - imu.heading(deg));
     intake.setSpeed(-100);
     task::sleep(100);
     intake.setSpeed(0);
-    matchloadCylinder.toggle(); //Last Changed, swapped with hood
+    matchloadCylinder.toggle();
     hoodCylinder.toggle();
 
-    xDrive.driveTo(-29, -47, 750); //Changed, works?
+    xDrive.driveTo(-29, -47, 750);
     intake.setSpeed(100);
     setScore();
     senseColor(oppositeColor, 2000);
@@ -1025,7 +1020,7 @@ void rightFarWing(vex::color c)
         task::sleep(100);
         intake.setSpeed(80);
         return 0; });
-    int t = xDrive.driveTo(-42, -45, 1000); 
+    int t = xDrive.driveTo(-42, -45, 1000);
     task::sleep(800 - t);
     intake.setSpeed(0);
     hoodCylinder.toggle();
@@ -1041,43 +1036,53 @@ void rightFarWing(vex::color c)
     xDrive.driveTo(-35, -34.5, 1500);
     matchloadCylinder.toggle();
     xDrive.turnFor(90 - imu.heading(deg));
-    xDrive.driveTo(-8, -38, 2000, -6, 6);
+    xDrive.driveTo(-8, -38, 800, -6, 6);
     wingCylinder.toggle();
-    //task::sleep(2000); //Paused for testing when first implimented
 
     // ----- Score Center ----- //
     vex::task([]()
               {
             task::sleep(100);
             intake.setSpeed(-80);
-            task::sleep(50);
+            task::sleep(100);
             intake.setSpeed(0);
-            task::sleep(250);
+            task::sleep(375);
             liftCylinder.toggle();
-            matchloadCylinder.toggle();
-            hoodCylinder.toggle();
-            return 0;});
+            return 0; });
 
-    task::sleep(500);
-    xDrive.driveToPose(15, -24, 315, 3000, -7, 7); //Drive towards mid goals //(10,-24)
+    task::sleep(50);
+    xDrive.driveToPose(12, -20, 315, 2000, -7, 7); // Drive towards mid goals //(10,-24)
 
-    //For some reason this works if there is a robot sitting there and works if there is no bot
-    //Attempts to body slam the robot that is there (I don't think it actually listens but it works...) 
-    //Also for some reason the sleeps were needed
-    task::sleep(100); 
-    xDrive.driveTo(13, -14.25, 10000, -6, 6); //Scoot over, was 2000   //DELETE IF DONT USE
-    task::sleep(100);
-    xDrive.driveTo(10, -10, 1000, -6, 6); //tries to body slam          /DELETE IF DONT USE
-    task::sleep(100);
+    // //For some reason this works if there is a robot sitting there and works if there is no bot
+    // //Attempts to body slam the robot that is there (I don't think it actually listens but it works...)
+    // //Also for some reason the sleeps were needed
+    // task::sleep(100);
+    // xDrive.driveTo(13, -14.25, 10000, -6, 6); //Scoot over, was 2000   //DELETE IF DONT USE
+    // task::sleep(100);
+    // xDrive.driveTo(10, -10, 1000, -6, 6); //tries to body slam          /DELETE IF DONT USE
+    // task::sleep(100);
 
-    //Actually aligns with the goal and scores
-    xDrive.driveTo(12.25, -14.25, 10000, -6, 6); //Scoot over, was 2000 
+    // Actually aligns with the goal and scores
+    vex::task([]()
+              {
+    task::sleep(20);
+    hoodCylinder.toggle();
+    return 0; });
+
+    xDrive.driveTo(12, -14.5, 1150, -6, 6); // Scoot over, was 2000
     intake.setSpeed(50);
     task::sleep(100);
     setScore();
-    senseColor(oppositeColor, 3000);
+    task::sleep(3000);
     intake.setSpeed(0);
-    //task::sleep(100); 
+    // task::sleep(100);
+
+    xDrive.driveLocal(-8, 0, 0, volt);
+    task::sleep(250);
+    intake.setSpeed(0);
+    hoodCylinder.toggle();
+    xDrive.driveToPose(12, -14.5, 315, 1500);
+    task::sleep(100);
 }
 
 void autonomous(void)
