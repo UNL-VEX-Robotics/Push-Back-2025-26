@@ -64,11 +64,17 @@ Lever lever(leverMotor);
 neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Red"), {
     neblib::Button(310, 60, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red > AWP"),
     neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red > x2"),
-    neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red > Wing")});
+    neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red > Wing"),
+    neblib::Button(10, 60, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < AWP"),
+    neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < x2"),
+    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < Wing")});
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
-    neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue AWP"),
-    neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue Elims"),
-    neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Right Blue Quick")});
+    neblib::Button(310, 60, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue > AWP"),
+    neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue > x2"),
+    neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue > Wing"),
+    neblib::Button(10, 60, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < AWP"),
+    neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < x2"),
+    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < Wing")});
 neblib::Page skillsPage = neblib::Page(neblib::Button(320, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Skills"), {neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Skills")});
 neblib::AutonSelector selector = neblib::AutonSelector(Brain, {&redPage, &bluePage, &skillsPage}, neblib::Button(180, 120, 120, 50, vex::color(255, 255, 255), vex::color(255, 255, 255), vex::color(0, 0, 0), vex::color(255, 255, 255), "Calibrate"));
 
@@ -116,10 +122,94 @@ void pre_auton(void)
     controller1.rumble(".");
 }
 
-const double matchLoadDistance = 3.25;
-void rightAWP()
+const double matchLoadDistance = 3.75;
+void rightStart()
 {
     imu.setHeading(180, deg);
+
+    // ----- Match Load ----- //
+    standardDrive.driveFor(dist.objectDistance(inches) - 19.5, 1.5);
+    lever.setVelocity(-100);
+    wingCylinder.set(true);
+    liftCylinder.set(true);
+    matchloadCylinder.toggle();
+    standardDrive.turnTo(270, 1.5);
+    intakeMotor.spin(forward, 100, percent);
+    standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5);
+    task::sleep(750);
+
+    // ----- Score Long Goal ----- //
+    standardDrive.driveFor(-32, 270, -7, 7, 1.5);
+    lever.setVelocity(60);
+    task::sleep(600);
+    lever.setVelocity(-100);
+    intakeMotor.spin(reverse, 100, percent);
+    vex::task([]() {
+        task::sleep(250);
+        intakeMotor.spin(forward, 100, percent);
+        return 0;
+    });
+
+    // ----- Match Load ----- //
+    standardDrive.driveFor(30, 270, -5, 5, 1.5);
+    task::sleep(1200);
+    standardDrive.driveFor(-12, 1);
+    task::sleep(100);
+    matchloadCylinder.toggle();
+    standardDrive.turnTo(240, .75);
+    intakeMotor.spin(reverse, 100, percent);
+    task::sleep(800);
+    standardDrive.turnTo(270);
+    matchloadCylinder.toggle();
+    task::sleep(200);
+    intakeMotor.spin(forward, 100, percent);
+    standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, -6, 6, 2);
+    task::sleep(2500);
+}
+
+void rightAWP()
+{
+    rightStart();
+
+    // ----- Score Middle Goal ----- //
+    standardDrive.driveFor(-3);
+    standardDrive.turnTo(44);
+    matchloadCylinder.toggle();
+    standardDrive.driveFor(52);
+    intakeMotor.spin(reverse, 100, percent);
+    task::sleep(3000);
+    standardDrive.driveFor(4, 1.5);
+}
+
+void rightMany()
+{
+    rightStart();
+    // ----- Score Long Goal ----- //
+    standardDrive.driveFor(-30, 270, 1.25);
+    lever.setVelocity(50);
+    task::sleep(600);
+    intakeMotor.spin(reverse, 100, percent);
+    lever.setVelocity(-100);
+    matchloadCylinder.toggle();
+}
+
+void rightWing()
+{
+    rightMany();   
+    
+    // standardDrive.turnFor(-45);
+    // standardDrive.driveFor(8);
+    // standardDrive.turnFor(45, 1.5);
+    // standardDrive.driveFor(-25);
+
+    standardDrive.swingFor(left, 63);
+    standardDrive.swingFor(right, 63);
+    standardDrive.driveFor(-27);
+}
+
+void leftStart()
+{
+    imu.setHeading(0, deg);
     
 
     // ----- Match Load ----- //
@@ -131,60 +221,7 @@ void rightAWP()
     standardDrive.turnTo(270, 1.5);
     intakeMotor.spin(forward, 100, percent);
     int totalMatchLoadTime = int(1000 * standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5));
-    task::sleep(1500 - totalMatchLoadTime);
-
-    // ----- Score Long Goal ----- //
-    standardDrive.driveFor(-32, 270, 1.5);
-    lever.setVelocity(100);
-    task::sleep(750);
-    lever.setVelocity(-100);
-    intakeMotor.spin(reverse, 100, percent);
-    vex::task([]() {
-        task::sleep(250);
-        intakeMotor.spin(forward, 100, percent);
-        return 0;
-    });
-
-    // ----- Match Load ----- //
-    standardDrive.driveFor(30, 270, -5, 5, 1.5);
-    task::sleep(1000);
-    standardDrive.driveFor(-12, 1);
-    task::sleep(100);
-    matchloadCylinder.toggle();
-    standardDrive.turnTo(300, .75);
-    intakeMotor.spin(reverse, 100, percent);
-    task::sleep(600);
-    standardDrive.turnTo(267);
-    matchloadCylinder.toggle();
-    task::sleep(200);
-    intakeMotor.spin(forward, 100, percent);
-    standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, -6, 6, 2);
-    task::sleep(2500);
-
-    // ----- Score Middle Goal ----- //
-    standardDrive.driveFor(-4);
-    standardDrive.turnTo(45);
-    matchloadCylinder.toggle();
-    standardDrive.driveFor(48);
-    intakeMotor.spin(reverse, 100, percent);
-    task::sleep(3000);
-    standardDrive.driveFor(4, 1.5);
-}
-
-void rightMany()
-{
-    imu.setHeading(180, deg);
-
-    // ----- Match Load ----- //
-    standardDrive.driveFor(dist.objectDistance(inches) - 18.25, 1.5);
-    lever.setVelocity(-100);
-    wingCylinder.set(true);
-    liftCylinder.set(true);
-    matchloadCylinder.toggle();
-    standardDrive.turnTo(270, 1.5);
-    intakeMotor.spin(forward, 100, percent);
-    int totalMatchLoadTime = int(1000 * standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5));
-    task::sleep(1100 - totalMatchLoadTime);
+    task::sleep(1250 - totalMatchLoadTime);
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-32, 270, 1.25);
@@ -206,13 +243,34 @@ void rightMany()
     matchloadCylinder.toggle();
     standardDrive.turnTo(300, .75);
     intakeMotor.spin(reverse, 100, percent);
-    task::sleep(600);
-    standardDrive.turnTo(267);
+    task::sleep(700);
+    standardDrive.turnTo(272);
     matchloadCylinder.toggle();
-    task::sleep(200);
+    task::sleep(500);
     intakeMotor.spin(forward, 100, percent);
     standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, -6, 6, 2);
     task::sleep(2500);
+}
+
+void leftAWP()
+{
+    leftStart();
+
+    // ----- Score Bottom Goal ----- //
+    standardDrive.driveFor(dist.objectDistance(inches) - 16, 2);
+    standardDrive.turnTo(180, 2);
+    matchloadCylinder.toggle();
+    standardDrive.driveFor(91);
+    task::sleep(250);
+    standardDrive.turnTo(45);
+    standardDrive.driveFor(43);
+    intakeMotor.spin(reverse, 100, percent);
+    task::sleep(3000);
+}
+
+void leftMany()
+{
+    leftStart();
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-30, 270, 1.25);
@@ -223,18 +281,13 @@ void rightMany()
     matchloadCylinder.toggle();
 }
 
-void rightWing()
+void leftWing()
 {
-    rightMany();   
-    
-    // standardDrive.turnFor(-45);
-    // standardDrive.driveFor(8);
-    // standardDrive.turnFor(45, 1.5);
-    // standardDrive.driveFor(-25);
+    leftMany();
 
-    standardDrive.swingFor(left, 70);
-    standardDrive.swingFor(right, 70);
-    standardDrive.driveFor(-25);
+    standardDrive.swingFor(left, 72);
+    standardDrive.swingFor(right, 72);
+    standardDrive.driveFor(-32, 2);
 }
 
 void skills()
@@ -257,21 +310,19 @@ void autonomous(void)
     {
         rightWing();
     }
-    else if (neblib::contains(auton, "Many"))
+    else if (neblib::contains(auton, "< AWP"))
     {
+        leftAWP();
     }
-    else if (neblib::contains(auton, "Skills"))
+    else if (neblib::contains(auton, "< x2"))
     {
-        skills();
+        leftMany();
+    }
+    else if (neblib::contains(auton, "< Wing"))
+    {
+        leftWing();
     }
     else{
-        imu.startCalibration();
-        do
-        {
-            task::sleep(5);
-        } while (imu.isCalibrating());
-        double t = standardDrive.swingFor(left, 45, 5);
-        controller1.Screen.print("%.2f, ", t);
     }
     
     lever.stopLoop();
