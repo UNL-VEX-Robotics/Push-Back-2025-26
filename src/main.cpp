@@ -128,7 +128,7 @@ void rightStart()
     imu.setHeading(180, deg);
 
     // ----- Match Load ----- //
-    standardDrive.driveFor(dist.objectDistance(inches) - 19.5, 1.5);
+    standardDrive.driveFor(dist.objectDistance(inches) - 18.5, 1.5);
     lever.setVelocity(-100);
     wingCylinder.set(true);
     liftCylinder.set(true);
@@ -136,7 +136,7 @@ void rightStart()
     standardDrive.turnTo(270, 1.5);
     intakeMotor.spin(forward, 100, percent);
     standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5);
-    task::sleep(750);
+    task::sleep(500);
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-32, 270, -7, 7, 1.5);
@@ -145,7 +145,7 @@ void rightStart()
     lever.setVelocity(-100);
     intakeMotor.spin(reverse, 100, percent);
     vex::task([]() {
-        task::sleep(250);
+        task::sleep(450);
         intakeMotor.spin(forward, 100, percent);
         return 0;
     });
@@ -156,12 +156,13 @@ void rightStart()
     standardDrive.driveFor(-12, 1);
     task::sleep(100);
     matchloadCylinder.toggle();
-    standardDrive.turnTo(240, .75);
+    standardDrive.turnTo(180, 1);
     intakeMotor.spin(reverse, 100, percent);
     task::sleep(800);
+    standardDrive.driveFor(dist.objectDistance(inches) - 17.5, 1.5);
     standardDrive.turnTo(270);
     matchloadCylinder.toggle();
-    task::sleep(200);
+    task::sleep(500);
     intakeMotor.spin(forward, 100, percent);
     standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, -6, 6, 2);
     task::sleep(2500);
@@ -172,11 +173,17 @@ void rightAWP()
     rightStart();
 
     // ----- Score Middle Goal ----- //
-    standardDrive.driveFor(-3);
-    standardDrive.turnTo(44);
+    standardDrive.driveFor(-4);
+    standardDrive.turnTo(45);
     matchloadCylinder.toggle();
-    standardDrive.driveFor(52);
+    standardDrive.driveFor(52, 2);
     intakeMotor.spin(reverse, 100, percent);
+    task([](){
+        lever.setVelocity(25);
+        task::sleep(100);
+        lever.setVelocity(-100);
+        return 0;
+    });
     task::sleep(3000);
     standardDrive.driveFor(4, 1.5);
 }
@@ -202,8 +209,8 @@ void rightWing()
     // standardDrive.turnFor(45, 1.5);
     // standardDrive.driveFor(-25);
 
-    standardDrive.swingFor(left, 63);
-    standardDrive.swingFor(right, 63);
+    standardDrive.swingFor(left, 70);
+    standardDrive.swingFor(right, 70);
     standardDrive.driveFor(-27);
 }
 
