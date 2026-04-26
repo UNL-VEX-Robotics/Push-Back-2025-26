@@ -1116,6 +1116,12 @@ void autonomous(void)
         rightFar(autonSelector.getColor());
     else if (neblib::contains(route, ">^ Wing"))
         rightFarWing(autonSelector.getColor());
+    else if (neblib::contains(route, "Skills"))
+    {
+        wingCylinder.toggle();
+        intake.setSpeed(-100);
+        task::sleep(1000);
+    }
 
     printTime();
 
