@@ -413,8 +413,8 @@ void leftAWP(vex::color c)
 
     // ----- Match load ----- //
     xDrive.driveLocal(-10, 10, 0, volt);
-    task::sleep(200);
-    xDrive.driveTo(-56.2, 45.5, 1000); // 1500
+    task::sleep(250);
+    xDrive.driveTo(-56.2, 45, 1000); // 1500
     intake.setSpeed(100);
     liftCylinder.toggle();
     matchloadCylinder.toggle();
@@ -436,9 +436,12 @@ void leftAWP(vex::color c)
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
 
-    xDrive.driveTo(-28, 47.5, 750); // 1000
+    xDrive.driveTo(-25, 48, 1000); // 1000 SCORE
     intake.setSpeed(100);
     setScore();
+    xDrive.driveLocal(-3, 0, 0, volt);
+    task::sleep(100);
+    xDrive.stop(hold);
     senseColor(oppositeColor, 2000);
     intake.setSpeed(0);
 
@@ -448,7 +451,7 @@ void leftAWP(vex::color c)
         task::sleep(100);
         intake.setSpeed(80);
         return 0; });
-    int t = xDrive.driveTo(-40, 48, 1000); // 1500
+    int t = xDrive.driveTo(-40, 47, 1500); // 1500
     task::sleep(800 - t);
     intake.setSpeed(0);
     hoodCylinder.toggle();
@@ -459,7 +462,7 @@ void leftAWP(vex::color c)
     //     65.5 - rightDistance.objectDistance(inches),
     //     imu.heading(deg));
 
-    xDrive.driveToPose(-56.25, 47.5, 270, 1250);
+    xDrive.driveToPose(-56.25, 47, 270, 1250);
     intake.setSpeed(100);
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
@@ -479,17 +482,17 @@ void leftAWP(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-9.5, 13.5, 135, 3000, -6, 6);
+    xDrive.driveToPose(-10, 12.25, 135, 3000, -6, 6);
     intake.setSpeed(50);
     setScore();
     task::sleep(3000);
     intake.setSpeed(0);
     xDrive.driveLocal(8, 0, 0, volt);
-    task::sleep(50);
+    task::sleep(100);
     xDrive.driveLocal(-8, 0, 0, volt);
-    task::sleep(150);
+    task::sleep(300);
     hoodCylinder.toggle();
-    xDrive.driveToPose(-12.5, 13.5, 135, 2000);
+    xDrive.driveToPose(-10.5, 12, 135, 3000, -6, 6);
     task::sleep(100);
 }
 
