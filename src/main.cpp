@@ -334,7 +334,7 @@ void autonomous(void)
     {
         wingCylinder.toggle();
         intakeMotor.spin(reverse, 100, percent);
-        task::sleep(100);
+        task::sleep(10000);
     }
     
     lever.stopLoop();
