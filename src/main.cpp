@@ -423,7 +423,6 @@ void leftAWP(vex::color c)
 
     // ----- Score long goal ----- //
     xDrive.driveTo(-36, 46.25, 1000); // 1500
-    auto curPose = odom.getPose();
     xDrive.turnFor(90 - imu.heading(deg));
     // odom.setPose(
     //     curPose.x,
@@ -435,8 +434,10 @@ void leftAWP(vex::color c)
     intake.setSpeed(0);
     hoodCylinder.toggle();
     matchloadCylinder.toggle();
+    auto curPose = odom.getPose();
+    odom.setPose(curPose.x, 65.5 - leftDistance.objectDistance(inches), imu.heading(deg));
 
-    xDrive.driveTo(-25, 48, 1000); // 1000 SCORE
+    xDrive.driveTo(-25, 49, 1000); // 1000 SCORE
     intake.setSpeed(100);
     setScore();
     xDrive.driveLocal(-3, 0, 0, volt);
@@ -465,8 +466,12 @@ void leftAWP(vex::color c)
     xDrive.driveToPose(-56.25, 47, 270, 1250);
     intake.setSpeed(100);
     matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    task::sleep(750);
+    matchloadCylinder.toggle();
+    task::sleep(250);
+    matchloadCylinder.toggle();
+    //xDrive.driveLocal(2.0, 0.0, 0.0);
+    task::sleep(1500);
 
     // ----- Score Center ----- //
     xDrive.driveTo(-42, 46.5, 1000);
