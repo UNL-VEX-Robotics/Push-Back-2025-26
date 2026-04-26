@@ -122,7 +122,7 @@ void pre_auton(void)
     controller1.rumble(".");
 }
 
-const double matchLoadDistance = 3.75;
+const double matchLoadDistance = 3.5;
 void rightStart()
 {
     imu.setHeading(180, deg);
@@ -330,7 +330,11 @@ void autonomous(void)
     {
         leftWing();
     }
-    else{
+    else if (neblib::contains(auton, "Skills"))
+    {
+        wingCylinder.toggle();
+        intakeMotor.spin(reverse, 100, percent);
+        task::sleep(100);
     }
     
     lever.stopLoop();
