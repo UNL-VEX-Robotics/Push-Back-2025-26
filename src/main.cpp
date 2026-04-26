@@ -412,7 +412,9 @@ void leftAWP(vex::color c)
     task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
 
     // ----- Match load ----- //
-    xDrive.driveTo(-56.2, 46, 1000); // 1500
+    xDrive.driveLocal(-10, 10, 0, volt);
+    task::sleep(200);
+    xDrive.driveTo(-56.2, 45.5, 1000); // 1500
     intake.setSpeed(100);
     liftCylinder.toggle();
     matchloadCylinder.toggle();
@@ -477,7 +479,7 @@ void leftAWP(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-12.5, 13.5, 135, 3000, -6, 6);
+    xDrive.driveToPose(-9.5, 13.5, 135, 3000, -6, 6);
     intake.setSpeed(50);
     setScore();
     task::sleep(3000);
