@@ -136,7 +136,7 @@ void rightStart()
     standardDrive.turnTo(270, 1.5);
     intakeMotor.spin(forward, 100, percent);
     standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5);
-    task::sleep(500);
+    task::sleep(400);
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-32, 270, -7, 7, 1.5);
@@ -177,6 +177,7 @@ void rightAWP()
     standardDrive.turnTo(45);
     matchloadCylinder.toggle();
     standardDrive.driveFor(52, 2);
+    standardDrive.driveFor(-4);
     intakeMotor.spin(reverse, 100, percent);
     task([](){
         lever.setVelocity(25);
