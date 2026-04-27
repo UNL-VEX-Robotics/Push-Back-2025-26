@@ -617,13 +617,17 @@ void rightStart(vex::color c)
     task::sleep(800 - t);
     intake.setSpeed(0);
     hoodCylinder.toggle();
-    xDrive.turnTo(270, 1000);
+    xDrive.turnTo(270, 750);
 
-    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
+    xDrive.driveToPose(-57, -46.5, 270, 1000);
     intake.setSpeed(100);
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    task::sleep(750);
+    matchloadCylinder.toggle();
+    task::sleep(250);
+    matchloadCylinder.toggle();
+    task::sleep(1750);
 }
 
 void rightAWP(vex::color c)
@@ -767,7 +771,7 @@ void rightFarWing(vex::color c)
     rightStart(c);
 
     // ----- Wing Long Goal ----- //
-    xDrive.driveTo(-35, -34.5, 1500);
+    xDrive.driveTo(-35, -34.75, 1500);
     matchloadCylinder.toggle();
     xDrive.turnFor(90 - imu.heading(deg));
     xDrive.driveTo(-8, -38, 800, -6, 6);
@@ -785,7 +789,7 @@ void rightFarWing(vex::color c)
             return 0; });
 
     task::sleep(50);
-    xDrive.driveToPose(12, -20, 315, 2000, -7, 7); // Drive towards mid goals //(10,-24)
+    xDrive.driveToPose(14, -22, 315, 2000, -7, 7); // Drive towards mid goals //(10,-24)
 
     // //For some reason this works if there is a robot sitting there and works if there is no bot
     // //Attempts to body slam the robot that is there (I don't think it actually listens but it works...)
@@ -803,7 +807,12 @@ void rightFarWing(vex::color c)
     hoodCylinder.toggle();
     return 0; });
 
-    xDrive.driveTo(12, -14.5, 1150, -6, 6); // Scoot over, was 2000
+    xDrive.driveTo(13.5, -14.5, 1000, -6, 6); // Scoot over, was 2000
+    vex::task([](){
+        printTime();
+        return 0;
+    });
+    
     intake.setSpeed(50);
     task::sleep(100);
     setScore();
@@ -812,7 +821,7 @@ void rightFarWing(vex::color c)
     // task::sleep(100);
 
     xDrive.driveLocal(-8, 0, 0, volt);
-    task::sleep(250);
+    task::sleep(150);
     intake.setSpeed(0);
     hoodCylinder.toggle();
     xDrive.driveToPose(12, -14.5, 315, 1500);
