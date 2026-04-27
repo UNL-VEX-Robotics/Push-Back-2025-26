@@ -686,7 +686,7 @@ void rightMid(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-8.5, 9, 135, 1250, -6, 6);
+    xDrive.driveToPose(-8, 9.75, 135, 1250, -6, 6);
     intake.setSpeed(50);
     setScore();
     task::sleep(3000);
@@ -694,7 +694,7 @@ void rightMid(vex::color c)
     task::sleep(250);
     intake.setSpeed(0);
     hoodCylinder.toggle();
-    xDrive.driveToPose(-8.5, 9, 135, 1500);
+    xDrive.driveToPose(-8.5, 9.5, 135, 1500);
     task::sleep(100);
 }
 
