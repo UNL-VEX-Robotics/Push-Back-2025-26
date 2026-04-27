@@ -122,7 +122,7 @@ void pre_auton(void)
     controller1.rumble(".");
 }
 
-const double matchLoadDistance = 3.5;
+const double matchLoadDistance = 3.25;
 void rightStart()
 {
     imu.setHeading(180, deg);
