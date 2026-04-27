@@ -403,8 +403,7 @@ void printTime()
     controller1.Screen.print(", ");
 }
 
-// ---------- Autonomous Routes ---------- //
-void leftAWP(vex::color c)
+void leftStart(vex::color c)
 {
     vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
 
@@ -470,8 +469,14 @@ void leftAWP(vex::color c)
     matchloadCylinder.toggle();
     task::sleep(250);
     matchloadCylinder.toggle();
-    //xDrive.driveLocal(2.0, 0.0, 0.0);
+    // xDrive.driveLocal(2.0, 0.0, 0.0);
     task::sleep(1500);
+}
+
+// ---------- Autonomous Routes ---------- //
+void leftAWP(vex::color c)
+{
+    leftStart(c);
 
     // ----- Score Center ----- //
     xDrive.driveTo(-42, 46.5, 1000);
@@ -503,68 +508,12 @@ void leftAWP(vex::color c)
 
 void leftMid(vex::color c)
 {
-    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
-
-    odom.setPose(-54.375, 65.5 - rightDistance.objectDistance(inches), 270.0);
-    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
-
-    // ----- Match load ----- //
-    xDrive.driveTo(-56.2, 45.5, 1000); // 1500
-    intake.setSpeed(100);
-    liftCylinder.toggle();
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); // 2000
-
-    // ----- Score long goal ----- //
-    xDrive.driveTo(-36, 45.5, 1000); // 1500
-    auto curPose = odom.getPose();
-    xDrive.turnFor(90 - imu.heading(deg));
-    // odom.setPose(
-    //     curPose.x,
-    //     65.5 - leftDistance.objectDistance(inches),
-    //     imu.heading(deg)
-    // );
-    intake.setSpeed(-100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    matchloadCylinder.toggle();
-
-    xDrive.driveTo(-28, 46.5, 750); // 1000
-    intake.setSpeed(100);
-    setScore();
-    senseColor(oppositeColor, 2000);
-    intake.setSpeed(0);
-
-    // ----- Match load ----- //
-    vex::task([]()
-              {
-        task::sleep(100);
-        intake.setSpeed(80);
-        return 0; });
-    int t = xDrive.driveTo(-40, 48, 1000); // 1500
-    task::sleep(800 - t);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    curPose = odom.getPose();
-    xDrive.turnTo(270, 1000);
-    // odom.setPose(
-    //     curPose.x,
-    //     65.5 - rightDistance.objectDistance(inches),
-    //     imu.heading(deg));
-
-    xDrive.driveToPose(-56.25, 47.5, 270, 1250);
-    intake.setSpeed(100);
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    leftStart(c);
 
     // ----- Wing ----- //
-    xDrive.driveTo(-32, 37.5, 1500);
-    intake.setSpeed(0);
+    xDrive.driveTo(-32, 38.5, 1500);
     matchloadCylinder.toggle();
-    xDrive.driveTo(0, 40, 2000, -5, 5);
+    xDrive.driveTo(2, 40.5, 2000, -5, 5);
     wingCylinder.toggle();
     xDrive.driveTo(-24, 24, 1000);
 
@@ -580,78 +529,23 @@ void leftMid(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-12.5, 13.5, 135, 3000, -6, 6);
+    xDrive.driveToPose(-10, 13.75, 135, 3000, -6, 6);
     intake.setSpeed(50);
     setScore();
     task::sleep(3000);
     intake.setSpeed(0);
     xDrive.driveLocal(8, 0, 0, volt);
-    task::sleep(50);
+    task::sleep(100);
     xDrive.driveLocal(-8, 0, 0, volt);
-    task::sleep(150);
+    task::sleep(300);
     hoodCylinder.toggle();
-    xDrive.driveToPose(-12.5, 13.5, 135, 2000);
+    xDrive.driveToPose(-10.5, 13.75, 135, 3000, -6, 6);
     task::sleep(100);
 }
 
 void leftEnd(vex::color c)
 {
-    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
-
-    odom.setPose(-54.375, 65.5 - rightDistance.objectDistance(inches), 270.0);
-    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
-
-    // ----- Match load ----- //
-    xDrive.driveTo(-56.2, 46, 1000); // 1500
-    intake.setSpeed(100);
-    liftCylinder.toggle();
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500); // 2000
-
-    // ----- Score long goal ----- //
-    xDrive.driveTo(-36, 46.25, 1000); // 1500
-    auto curPose = odom.getPose();
-    xDrive.turnFor(90 - imu.heading(deg));
-    // odom.setPose(
-    //     curPose.x,
-    //     65.5 - leftDistance.objectDistance(inches),
-    //     imu.heading(deg)
-    // );
-    intake.setSpeed(-100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    matchloadCylinder.toggle();
-
-    xDrive.driveTo(-28, 47.5, 750); // 1000
-    intake.setSpeed(100);
-    setScore();
-    senseColor(oppositeColor, 2000);
-    intake.setSpeed(0);
-
-    // ----- Match load ----- //
-    vex::task([]()
-              {
-        task::sleep(100);
-        intake.setSpeed(80);
-        return 0; });
-    int t = xDrive.driveTo(-40, 48, 1000); // 1500
-    task::sleep(800 - t);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    curPose = odom.getPose();
-    xDrive.turnTo(270, 1000);
-    odom.setPose(
-        curPose.x,
-        65.5 - rightDistance.objectDistance(inches),
-        imu.heading(deg));
-
-    xDrive.driveToPose(-56.25, 47.5, 270, 1250);
-    intake.setSpeed(100);
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    leftStart(c);
 
     // ----- Score Center ----- //
     xDrive.driveTo(-42, 46.5, 1000);
@@ -667,7 +561,7 @@ void leftEnd(vex::color c)
         task::sleep(300);
         hoodCylinder.toggle();
         return 0; });
-    xDrive.driveToPose(-12.5, 13.5, 135, 3000, -6, 6);
+    xDrive.driveToPose(-10, 12.25, 135, 3000, -6, 6);
     intake.setSpeed(50);
     setScore();
     task::sleep(3000);
@@ -680,10 +574,10 @@ void leftEnd(vex::color c)
     hoodCylinder.toggle();
     liftCylinder.toggle();
     xDrive.turnTo(270, 1000);
-    xDrive.driveTo(0, 40, 2000, -5, 5);
+    xDrive.driveTo(2, 39, 2000, -5, 5);
 }
 
-void rightAWP(vex::color c)
+void rightStart(vex::color c)
 {
     vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
 
@@ -730,6 +624,11 @@ void rightAWP(vex::color c)
     matchloadCylinder.toggle();
     xDrive.driveLocal(2.0, 0.0, 0.0);
     task::sleep(2000);
+}
+
+void rightAWP(vex::color c)
+{
+    rightStart(c);
 
     // ----- Score Center ----- //
     xDrive.driveTo(-37, -41.5, 1000);
@@ -760,51 +659,7 @@ void rightAWP(vex::color c)
 
 void rightMid(vex::color c)
 {
-    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
-
-    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
-    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
-
-    // ----- Match Load ----- //
-    xDrive.driveTo(-58, -46, 1000);
-    intake.setSpeed(100);
-    liftCylinder.toggle();
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500);
-
-    // ----- Score Long Goal ----- //
-    xDrive.driveTo(-40, -46.25, 1000);
-    xDrive.turnFor(90 - imu.heading(deg));
-    intake.setSpeed(-100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    matchloadCylinder.toggle();
-
-    xDrive.driveTo(-29, -47, 750);
-    intake.setSpeed(100);
-    setScore();
-    senseColor(oppositeColor, 2000);
-    intake.setSpeed(0);
-
-    // ----- Match Load 2 ----- //
-    vex::task([]()
-              {
-        task::sleep(100);
-        intake.setSpeed(80);
-        return 0; });
-    int t = xDrive.driveTo(-42, -47, 1000);
-    task::sleep(800 - t);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    xDrive.turnTo(270, 1000);
-
-    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
-    intake.setSpeed(100);
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    rightStart(c);
 
     // ----- Wing Long Goal ----- //
     xDrive.driveTo(-35, -34.5, 1500);
@@ -841,51 +696,7 @@ void rightMid(vex::color c)
 
 void rightEnd(vex::color c)
 {
-    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
-
-    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
-    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
-
-    // ----- Match Load ----- //
-    xDrive.driveTo(-58, -46, 1000);
-    intake.setSpeed(100);
-    liftCylinder.toggle();
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500);
-
-    // ----- Score Long Goal ----- //
-    xDrive.driveTo(-40, -46.25, 1000);
-    xDrive.turnFor(90 - imu.heading(deg));
-    intake.setSpeed(-100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    matchloadCylinder.toggle();
-
-    xDrive.driveTo(-29, -47, 750);
-    intake.setSpeed(100);
-    setScore();
-    senseColor(oppositeColor, 2000);
-    intake.setSpeed(0);
-
-    // ----- Match Load 2 ----- //
-    vex::task([]()
-              {
-        task::sleep(100);
-        intake.setSpeed(80);
-        return 0; });
-    int t = xDrive.driveTo(-42, -47, 1000);
-    task::sleep(800 - t);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    xDrive.turnTo(270, 1000);
-
-    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
-    intake.setSpeed(100);
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(1.75, 0.0, 0.0);
-    task::sleep(2000);
+    rightStart(c);
 
     // ----- Score Center ----- //
     xDrive.driveTo(-42, -46.5, 1000);
@@ -922,51 +733,7 @@ void rightEnd(vex::color c)
 
 void rightFar(vex::color c)
 {
-    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
-
-    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
-    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
-
-    // ----- Match Load ----- //
-    xDrive.driveTo(-58, -46, 1000);
-    intake.setSpeed(100);
-    liftCylinder.toggle();
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500);
-
-    // ----- Score Long Goal ----- //
-    xDrive.driveTo(-40, -46.25, 1000);
-    xDrive.turnFor(90 - imu.heading(deg));
-    intake.setSpeed(-100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    matchloadCylinder.toggle();
-
-    xDrive.driveTo(-29, -47, 750);
-    intake.setSpeed(100);
-    setScore();
-    senseColor(oppositeColor, 2000);
-    intake.setSpeed(0);
-
-    // ----- Match Load 2 ----- //
-    vex::task([]()
-              {
-        task::sleep(100);
-        intake.setSpeed(80);
-        return 0; });
-    int t = xDrive.driveTo(-42, -47, 1000);
-    task::sleep(800 - t);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    xDrive.turnTo(270, 1000);
-
-    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
-    intake.setSpeed(100);
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    rightStart(c);
 
     // ----- Score Center ----- //
     vex::task([]()
@@ -990,57 +757,14 @@ void rightFar(vex::color c)
     intake.setSpeed(50);
     task::sleep(100);
     setScore();
+    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
     senseColor(oppositeColor, 3000);
     intake.setSpeed(0);
 }
 
 void rightFarWing(vex::color c)
 {
-    vex::color oppositeColor = (c == vex::color::red) ? vex::color::blue : vex::color::red;
-
-    odom.setPose(-54.375, -65.5 + leftDistance.objectDistance(inches), 270.0);
-    task a = neblib::launchTask(std::bind(&neblib::Odometry::begin, &odom));
-
-    // ----- Match Load ----- //
-    xDrive.driveTo(-58, -46, 1000);
-    intake.setSpeed(100);
-    liftCylinder.toggle();
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(1500);
-
-    // ----- Score Long Goal ----- //
-    xDrive.driveTo(-40, -46.25, 1000);
-    xDrive.turnFor(90 - imu.heading(deg));
-    intake.setSpeed(-100);
-    task::sleep(100);
-    intake.setSpeed(0);
-    matchloadCylinder.toggle();
-    hoodCylinder.toggle();
-
-    xDrive.driveTo(-29, -47, 750);
-    intake.setSpeed(100);
-    setScore();
-    senseColor(oppositeColor, 2000);
-    intake.setSpeed(0);
-
-    // ----- Match Load 2 ----- //
-    vex::task([]()
-              {
-        task::sleep(100);
-        intake.setSpeed(80);
-        return 0; });
-    int t = xDrive.driveTo(-42, -45, 1000);
-    task::sleep(800 - t);
-    intake.setSpeed(0);
-    hoodCylinder.toggle();
-    xDrive.turnTo(270, 1000);
-
-    xDrive.driveToPose(-56.25, -46.5, 270, 1250);
-    intake.setSpeed(100);
-    matchloadCylinder.toggle();
-    xDrive.driveLocal(2.0, 0.0, 0.0);
-    task::sleep(2000);
+    rightStart(c);
 
     // ----- Wing Long Goal ----- //
     xDrive.driveTo(-35, -34.5, 1500);
