@@ -221,38 +221,39 @@ void leftStart()
     
 
     // ----- Match Load ----- //
-    standardDrive.driveFor(dist.objectDistance(inches) - 18.25, 1.5);
+    standardDrive.driveFor(dist.objectDistance(inches) - 18.5, 1.5);
     lever.setVelocity(-100);
     wingCylinder.set(true);
     liftCylinder.set(true);
     matchloadCylinder.toggle();
     standardDrive.turnTo(270, 1.5);
     intakeMotor.spin(forward, 100, percent);
-    int totalMatchLoadTime = int(1000 * standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5));
-    task::sleep(1250 - totalMatchLoadTime);
+    standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5);
+    task::sleep(600);
 
     // ----- Score Long Goal ----- //
-    standardDrive.driveFor(-32, 270, 1.25);
-    lever.setVelocity(70);
+    standardDrive.driveFor(-32, 270, -7, 7, 1.5);
+    lever.setVelocity(60);
     task::sleep(600);
     lever.setVelocity(-100);
     intakeMotor.spin(reverse, 100, percent);
     vex::task([]() {
-        task::sleep(250);
+        task::sleep(450);
         intakeMotor.spin(forward, 100, percent);
         return 0;
     });
 
     // ----- Match Load ----- //
     standardDrive.driveFor(30, 270, -5, 5, 1.5);
-    task::sleep(1000);
+    task::sleep(1200);
     standardDrive.driveFor(-12, 1);
     task::sleep(100);
     matchloadCylinder.toggle();
-    standardDrive.turnTo(300, .75);
+    standardDrive.turnTo(180, 1);
     intakeMotor.spin(reverse, 100, percent);
-    task::sleep(700);
-    standardDrive.turnTo(272);
+    task::sleep(800);
+    standardDrive.driveFor(dist.objectDistance(inches) - 17.5, 1.5);
+    standardDrive.turnTo(270);
     matchloadCylinder.toggle();
     task::sleep(500);
     intakeMotor.spin(forward, 100, percent);
@@ -293,9 +294,9 @@ void leftWing()
 {
     leftMany();
 
-    standardDrive.swingFor(left, 72);
-    standardDrive.swingFor(right, 72);
-    standardDrive.driveFor(-32, 2);
+    standardDrive.swingFor(left, 70);
+    standardDrive.swingFor(right, 70);
+    standardDrive.driveFor(-27, 2);
 }
 
 void skills()
