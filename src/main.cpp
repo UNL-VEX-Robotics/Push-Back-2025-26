@@ -233,7 +233,7 @@ void leftStart()
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-32, 270, -7, 7, 1.5);
-    lever.setVelocity(60);
+    lever.setVelocity(50);
     task::sleep(600);
     lever.setVelocity(-100);
     intakeMotor.spin(reverse, 100, percent);
@@ -249,7 +249,7 @@ void leftStart()
     standardDrive.driveFor(-12, 1);
     task::sleep(100);
     matchloadCylinder.toggle();
-    standardDrive.turnTo(180, 1);
+    standardDrive.turnTo(0, 1);
     intakeMotor.spin(reverse, 100, percent);
     task::sleep(800);
     standardDrive.driveFor(dist.objectDistance(inches) - 17.5, 1.5);
@@ -283,8 +283,8 @@ void leftMany()
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-30, 270, 1.25);
-    lever.setVelocity(60);
-    task::sleep(600);
+    lever.setVelocity(50);
+    task::sleep(650);
     intakeMotor.spin(reverse, 100, percent);
     lever.setVelocity(-100);
     matchloadCylinder.toggle();
@@ -296,7 +296,7 @@ void leftWing()
 
     standardDrive.swingFor(left, 70);
     standardDrive.swingFor(right, 70);
-    standardDrive.driveFor(-27, 2);
+    standardDrive.driveFor(-31, 2);
 }
 
 void skills()
