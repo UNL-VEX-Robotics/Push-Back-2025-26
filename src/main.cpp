@@ -67,14 +67,16 @@ neblib::Page redPage = neblib::Page(neblib::Button(0, 0, 160, 50, vex::color(155
     neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red > Wing"),
     neblib::Button(10, 60, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < AWP"),
     neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < x2"),
-    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < Wing")});
+    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < Wing"),
+    neblib::Button(180, 60, 120, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Red < Q")});
 neblib::Page bluePage = neblib::Page(neblib::Button(160, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Blue"), {
     neblib::Button(310, 60, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue > AWP"),
     neblib::Button(310, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue > x2"),
     neblib::Button(310, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue > Wing"),
     neblib::Button(10, 60, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < AWP"),
     neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < x2"),
-    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < Wing")});
+    neblib::Button(10, 180, 160, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < Wing"),
+    neblib::Button(180, 60, 120, 50, vex::color(0, 0, 0), vex::color(0, 0, 150), vex::color(255, 255, 255), vex::color(255, 255, 255), "Blue < Q")});
 neblib::Page skillsPage = neblib::Page(neblib::Button(320, 0, 160, 50, vex::color(155, 155, 155), vex::color(75, 75, 75), vex::color(255, 255, 255), vex::color(0, 0, 0), "Skills"), {neblib::Button(10, 120, 160, 50, vex::color(0, 0, 0), vex::color(150, 0, 0), vex::color(255, 255, 255), vex::color(255, 255, 255), "Left Skills")});
 neblib::AutonSelector selector = neblib::AutonSelector(Brain, {&redPage, &bluePage, &skillsPage}, neblib::Button(180, 120, 120, 50, vex::color(255, 255, 255), vex::color(255, 255, 255), vex::color(0, 0, 0), vex::color(255, 255, 255), "Calibrate"));
 
@@ -229,7 +231,7 @@ void leftStart()
     standardDrive.turnTo(270, 1.5);
     intakeMotor.spin(forward, 100, percent);
     standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5);
-    task::sleep(600);
+    task::sleep(300);
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-32, 270, -7, 7, 1.5);
@@ -294,8 +296,42 @@ void leftWing()
 {
     leftMany();
 
-    standardDrive.swingFor(left, 70);
-    standardDrive.swingFor(right, 70);
+    standardDrive.swingFor(left, 68);
+    standardDrive.swingFor(right, 68);
+    standardDrive.driveFor(-31, 2);
+}
+
+void leftQuick()
+{
+    imu.setHeading(0, deg);
+    
+
+    // ----- Match Load ----- //
+    standardDrive.driveFor(dist.objectDistance(inches) - 18.5, 1.5);
+    lever.setVelocity(-100);
+    wingCylinder.set(true);
+    liftCylinder.set(true);
+    matchloadCylinder.toggle();
+    standardDrive.turnTo(270, 1.5);
+    intakeMotor.spin(forward, 100, percent);
+    standardDrive.driveFor(dist.objectDistance(inches) - matchLoadDistance, 1.5);
+    task::sleep(200);
+
+    // ----- Score Long Goal ----- //
+    standardDrive.driveFor(-32, 270, -7, 7, 1.5);
+    lever.setVelocity(50);
+    task::sleep(600);
+    lever.setVelocity(-100);
+    intakeMotor.spin(reverse, 100, percent);
+    vex::task([]() {
+        task::sleep(450);
+        intakeMotor.spin(forward, 100, percent);
+        return 0;
+    });
+    matchloadCylinder.toggle();
+
+    standardDrive.swingFor(left, 60);
+    standardDrive.swingFor(right, 62);
     standardDrive.driveFor(-31, 2);
 }
 
@@ -330,6 +366,10 @@ void autonomous(void)
     else if (neblib::contains(auton, "< Wing"))
     {
         leftWing();
+    }
+    else if (neblib::contains(auton, "< Q"))
+    {
+        leftQuick();
     }
     else if (neblib::contains(auton, "Skills"))
     {
