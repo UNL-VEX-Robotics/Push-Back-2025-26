@@ -235,8 +235,11 @@ void leftStart()
 
     // ----- Score Long Goal ----- //
     standardDrive.driveFor(-32, 270, -7, 7, 1.5);
-    lever.setVelocity(50);
-    task::sleep(600);
+    for (int i = 0; i < 6; i++)
+    {
+        lever.setVelocity(50);
+        task::sleep(100);
+    }
     lever.setVelocity(-100);
     intakeMotor.spin(reverse, 100, percent);
     vex::task([]() {

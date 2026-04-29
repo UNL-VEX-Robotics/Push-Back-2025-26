@@ -20,7 +20,7 @@ void Lever::startLoop()
             lever.stop(vex::brakeType::coast);
         }
         else{
-            if (abs(lever.velocity(vex::velocityUnits::pct)) < 0.05 * abs(velocity))
+            if (abs(lever.velocity(vex::velocityUnits::pct)) < 0.03 * abs(velocity))
                 timeStuck += 10;
             
             if (timeStuck > 250)
@@ -47,7 +47,7 @@ bool Lever::isUp()
 
 void Lever::setVelocity(const double velocity)
 {
-    if (this->velocity != velocity)
+    if (this->velocity != velocity || this->velocity > 0)
     {
         this->velocity = velocity;
         timeStuck = 0;
